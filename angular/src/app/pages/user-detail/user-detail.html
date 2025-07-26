@@ -1,0 +1,162 @@
+<app-navbar></app-navbar>
+
+<div class="container mt-5">
+  <div class="row align-items-center">
+    
+    <!-- Columna del ícono/avatar -->
+    <div class="col-md-4 text-center">
+      <i class="bi bi-person-circle" style="font-size: 8rem; color: gray;"></i>
+    </div>
+
+    <!-- Columna de los datos -->
+    <div class="col-md-8">
+      <table class="table table-borderless">
+        <tbody>
+          <tr>
+            <th scope="row">Email</th>
+            <td>{{ user.email }}</td>
+          </tr>
+          <tr>
+            <th scope="row">Nombre</th>
+            <td>{{ user.nombre }}</td>
+          </tr>
+          <tr>
+            <th scope="row">Apellido</th>
+            <td>{{ user.apellido }}</td>
+          </tr>
+          <tr *ngIf="user.matricula">
+            <th scope="row">Nro. Matrícula</th>
+            <td>{{ user.matricula }}</td>
+          </tr>
+          <tr *ngIf="user.organizacion">
+            <th scope="row">Organización Social</th>
+            <td>{{ user.organizacion.nombre }}</td>
+          </tr>
+          <tr *ngIf="(user.roles && user.roles.length > 0) || user.organizacion?.rol">
+            <th scope="row">Roles</th>
+              <td>
+              <ul class="list-unstyled mb-0" *ngIf="user.roles && user.roles.length > 0 && user.roles[0].nombre">
+                <li *ngFor="let rol of user.roles">
+                  {{ rol.nombre }} 
+                </li>
+              </ul>
+              <span *ngIf="user.organizacion?.rol">
+                {{ user.organizacion.rol.nombre }}
+              </span>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+
+
+    <!-- Botones editar/eliminar -->
+    <div class="mb-2 d-flex justify-content-around">
+      <div class="row w-100"> <!--Para que ocupe el 100% de ancho-->
+
+        <div class="col-md-6 d-flex justify-content-end">
+          <button class="btn btn-outline-success d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#editUserModal">
+            Editar
+            <i class="bi bi-pencil ms-2"></i>
+          </button>
+        </div>
+
+        <div class="col-md-6 d-flex justify-content-start">
+          <button class="btn btn-outline-danger d-flex align-items-center" (click)="confirmDelete(user.id)">
+            Eliminar
+            <i class="bi bi-trash ms-2"></i>
+          </button>
+        </div>
+
+        </div>
+    </div>
+  </div>
+
+  <!-- Modal editar usuario-->
+  <div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+
+        <div class="modal-header">
+          <h5 class="modal-title" id="editUserModalLabel">Editar usuario</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+
+        <div class="modal-body">
+          <form>
+
+            <div class="mb-3">
+              <label for="nombre" class="form-label">Nombre</label>
+              <input type="text" class="form-control" id="nombre" name="nombre" placeholder={{user.nombre}}>
+            </div>
+
+            <div class="mb-3">
+              <label for="apellido" class="form-label">Apellido</label>
+              <input type="text" class="form-control" id="apellido" name="apellido" placeholder={{user.apellido}}>
+            </div>
+
+            <div class="mb-3">
+              <label for="email" class="form-label">Email</label>
+              <input type="email" class="form-control" id="email" name="email" placeholder={{user.email}}>
+            </div>
+
+            <div class="mb-3" *ngIf="user.matricula">
+              <label for="matricula" class="form-label">Nro. Matrícula</label>
+              <input type="number" class="form-control" id="matricula" name="matricula" placeholder={{user.matricula}}>
+            </div>
+
+            <div class="mb-3">
+              <label for="password" class="form-label">Contraseña</label>
+              <input type="password" class="form-control" id="password" name="password" placeholder="Nueva contraseña">
+            </div>
+
+            <div class="mb-3">
+              <label for="password" class="form-label">Repetir contraseña</label>
+              <input type="password" class="form-control" id="repeat-password" name="repeat-password" placeholder="Repita la contraseña">
+            </div>
+
+            <div class="mb-3">
+  <label for="rol" class="form-label">Rol</label>
+  <select
+    id="rol"
+    class="form-select"
+    [(ngModel)]="editUser.rol.nombre"
+    name="rol"
+    (change)="onRolChange()"
+  >
+    <option [ngValue]="null">Sin rol</option>
+    <option *ngFor="let rol of roles" [ngValue]="rol"> <!-- Aca rol lo obtiene del select de arriba que tiene id=rol-->
+      {{ rol }}
+    </option>
+  </select>
+</div>
+            <!-- Selector de organización -->
+            <div class="mb-3">
+              <label for="organizacion" class="form-label">Organización</label>
+              <select
+                id="organizacion"
+                class="form-select"
+                [(ngModel)]="editUser.organizacion"
+                name="organizacion"
+                [disabled]="editUser.rol === 'Admin'"
+              >
+                <option [ngValue]="null">Seleccione una organización</option>
+                <option *ngFor="let org of organizaciones" [ngValue]="org">
+                  {{ org.nombre }}
+                </option>
+              </select>
+            </div>
+
+            <div class="d-grid">
+              <button type="submit" class="btn btn-primary" (click)="updateUser()">Guardar cambios</button>
+            </div>
+
+          </form>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>

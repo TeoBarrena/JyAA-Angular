@@ -1,0 +1,8 @@
+{
+  "/rest": { "_comentario": "Este sirve para produccion, se pone /rest porque en el docker buildea al war con ROOT.war, root = /" ,
+    "target": "https://grupo8.jyaa-ci.linti.unlp.edu.ar",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  }
+}

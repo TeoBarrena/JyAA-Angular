@@ -1,0 +1,132 @@
+.welcome-container {
+  position: relative;
+  min-height: 100vh;
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start; /* antes: space-between */
+  overflow: hidden;
+}
+
+.welcome-content {
+  padding: 5rem 4rem;
+  z-index: 2;
+}
+
+.welcome-content h1 {
+  font-size: 2.8rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+.welcome-content p {
+  font-size: 1rem;
+  max-width: 500px;
+  margin-bottom: 2rem;
+}
+
+.welcome-button {
+  background-color: #005a63;
+  color: white;
+  padding: 0.6rem 1.2rem;
+  border-radius: 20px;
+  text-decoration: none;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.arrow-down {
+  font-size: 1.2rem;
+}
+
+.wave-wrapper {
+  position: relative;
+  width: 100%;
+  height: auto;
+  margin-top: 4px; /* Ajustá este valor según lo que necesites */
+}
+
+.wave-svg {
+  height: 250px;
+  margin-top: -70px;
+  width: 100%;
+}
+
+.logo-unlp {
+  position: absolute;
+  right: 5rem;
+  bottom: 14rem;
+  width: 220px;
+  z-index: 0;
+}
+
+
+@media (max-width: 768px) {
+  .welcome-content {
+    padding: 2rem;
+    max-width: 100%;
+  }
+
+  .welcome-content h1 {
+    font-size: 2rem;
+  }
+
+  .logo-unlp {
+    width: 150px;
+  }
+}
+
+.info-section {
+  background: linear-gradient(to right, #046870, #02717a);
+  color: white;
+  padding-top: 2rem; /* en lugar de 4rem si querés reducir altura */
+  margin-top: -20px; /* ← Ajustá este valor hasta que desaparezca el espacio */
+}
+
+.info-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  justify-content: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.info-block {
+  flex: 1 1 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.info-block img {
+  width: 100%;
+  border-radius: 10px;
+  object-fit: cover;
+  max-height: 250px;
+}
+
+.back-button {
+  align-self: flex-start;
+  background-color: white;
+  color: #005a63;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  text-decoration: none;
+  font-weight: bold;
+  margin-top: -0.5rem;
+}
+
+@media (max-width: 768px) {
+  .info-container {
+    flex-direction: column;
+    padding: 1rem;
+  }
+
+  .info-block img {
+    max-height: 200px;
+  }
+}

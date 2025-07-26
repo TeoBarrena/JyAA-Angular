@@ -1,0 +1,111 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap');
+
+
+/* Centra vertical y horizontalmente */
+.login-wrapper {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f5f8fa; /* Fondo muy suave para mejor contraste */
+}
+
+/* Contenedor del formulario */
+.login-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  padding: 2.5rem 3rem;
+  border-radius: 10px;
+  background-color: white;
+  box-shadow: 0 6px 25px rgba(0, 90, 99, 0.15); /* sombra con el azul */
+  text-align: center;
+  min-width: 320px;
+  max-width: 400px;
+  font-family: 'Montserrat', sans-serif;
+  color: #003e45; /* Azul oscuro suave */
+}
+
+.login-container h2 {
+  margin-bottom: 1.2rem;
+  font-weight: 600;
+  font-size: 2.4rem;
+  color: #415052; /* Azul principal */
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* Inputs estilo Ag 16/16 */
+.input {
+  padding: 0.6rem 0.8rem;
+  border: 1.8px solid #005a63;
+  border-radius: 6px;
+  outline: none;
+  width: 100%;
+  font-size: 16px;       /* Ag 16 */
+  line-height: 16px;     /* Ag 16 */
+  font-weight: 500;
+  color: #003e45;
+  font-family: 'Montserrat', sans-serif;
+  transition: border-color 0.3s ease;
+}
+
+.input::placeholder {
+  color: #7ca3a8;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 16px;       /* placeholder igual tamaño */
+  line-height: 16px;
+}
+
+.input:focus {
+  border-color: #0099a1;
+  box-shadow: 0 0 6px rgba(0, 153, 161, 0.4);
+}
+
+/* Grupo de botones */
+.button-group {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+/* Botones */
+.btn {
+  padding: 0.65rem 1.4rem;
+  border-radius: 6px;
+  font-size: 1.05rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease-in-out;
+  width: 100%;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  user-select: none;
+}
+
+.btn-outline {
+  border: 2px solid #005a63;
+  background-color: transparent;
+  color: #005a63;
+}
+
+.btn-outline:hover {
+  background-color: #005a63;
+  color: white;
+  box-shadow: 0 0 8px #005a63aa;
+}
+
+.btn-filled {
+  border: none;
+  background-color: #005a63;
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 90, 99, 0.6);
+}
+
+.btn-filled:hover {
+  background-color: #003e45;
+  box-shadow: 0 6px 18px rgba(0, 62, 69, 0.8);
+}

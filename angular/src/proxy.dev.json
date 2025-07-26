@@ -1,0 +1,9 @@
+
+{
+  "/Entrega4/rest": { "_comentario": "Este sirve para desarrollo local, en prod se usa /rest" ,
+    "target": "http://localhost:8080",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  }
+}

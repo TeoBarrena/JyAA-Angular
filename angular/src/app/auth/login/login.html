@@ -1,0 +1,18 @@
+
+
+<app-navbar></app-navbar>
+
+
+
+<div class="login-wrapper">
+  <div class="login-container">
+    {{ errorMessage}}
+    <h2>Iniciar Sesión</h2>
+    <input [(ngModel)]="email" type="email" placeholder="Ingrese su correo electrónico" class="input" />
+    <input [(ngModel)]="password" type="password" placeholder="Ingrese su contraseña" class="input" />
+    <div class="button-group">
+      <button (click)="login()" class="btn btn-outline">Ingresar</button>
+      <button routerLink="/register" class="btn btn-filled">Registrarse</button>
+    </div>
+  </div>
+</div>

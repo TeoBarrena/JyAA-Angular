@@ -1,0 +1,53 @@
+import { Injectable } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
+
+//Funciona como un servicio no como componente
+@Injectable({providedIn: 'root'}) //permite inyeccion global del servicio
+export class AuthService {
+  private loggedIn = new BehaviorSubject<boolean>(this.hasSession()); //observable para el estado de autenticación
+  isLoggedIn$ = this.loggedIn.asObservable(); //observable para que otros componentes puedan suscribirse
+
+  private hasSession(): boolean {
+    return localStorage.getItem('isLoggedIn') === 'true'; //verifica si hay una sesión activa
+  }
+
+  login(){
+    localStorage.setItem('isLoggedIn', 'true'); //guarda el estado de inicio de sesión en localStorage
+    this.loggedIn.next(true); //cambia el estado a inicio sesión
+  }
+
+  logout(){
+    localStorage.removeItem('isLoggedIn'); //elimina el estado de inicio de sesión en localStorage
+    localStorage.removeItem('userRole'); //elimina el rol del usuario
+    localStorage.removeItem('userId');
+    this.clearToken();
+    this.loggedIn.next(false); //cambia el estado a cierre sesión
+  }
+
+  isLoggedIn(): boolean {
+    return this.loggedIn.value; //devuelve el estado actual de autenticación
+  }
+
+  //Manejo de token para JWT
+  setToken(token:string): void {
+    localStorage.setItem('token', token);
+  }
+
+  getToken(): string | null {
+    return localStorage.getItem('token');
+  }
+
+  clearToken(): void {
+    return localStorage.removeItem('token');
+  }
+
+  //Manejo de roles 
+  setUserRole(role: string) {
+    localStorage.setItem('userRole', role);
+  }
+
+  getUserRole(): string | null {
+    return localStorage.getItem('userRole'); //devuelve el rol del usuario almacenado en localStorage
+  }
+
+}
