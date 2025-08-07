@@ -5,6 +5,7 @@ import { environment } from '../../../environments/environment.development';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../auth/auth-service/auth-service';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-barrios',
@@ -30,6 +31,7 @@ export class Barrios {
   constructor(
     private http: HttpClient,
     private auth: AuthService,
+    private router: Router,
   ){}
 
   ngOnInit() {
@@ -114,6 +116,10 @@ export class Barrios {
 
     const modal = new (window as any).bootstrap.Modal(document.getElementById('editBarrioModal'));
     modal.show();
+  }
+
+  viewBarrio(barrioId: number) {
+    this.router.navigate(['/barrios/', barrioId]);
   }
   
   guardarCambiosBarrio() {

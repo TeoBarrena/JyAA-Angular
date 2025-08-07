@@ -38,15 +38,18 @@
                         {{ campania.inicio }} / {{ campania.fin }}
                     </td>
                     <td class="align-middle text-center fw-semibold">
-                        {{ campania.barrio.nombre }}
+                        <a [routerLink]="['/barrios', campania.barrio.id]">
+                          {{ campania.barrio.nombre }}
+                        </a>
                     </td>
                     
                     <td class="align-middle text-center fw-semibold">
                         <div *ngFor="let jornada of campania.jornadas">
+                          <a [routerLink]="['/jornada', jornada.id]">
                             {{ jornada.fecha }}
+                          </a>
                         </div>
                     </td>
-                    
 
                     <td class="align-middle text-center" *ngIf="rolUser === 'admin'">
                         <div class="d-flex justify-content-center gap-2">

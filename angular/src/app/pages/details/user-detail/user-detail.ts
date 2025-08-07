@@ -2,9 +2,9 @@ import { Component } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router'; //sirve para obtener parámetros de la ruta
 import { CommonModule } from '@angular/common'; 
-import { Navbar } from '../../layout/navbar/navbar';
-import { environment } from '../../../environments/environment.development';
-import { Users } from '../users/users'; //Importar Users para poder usar el método deleteUser
+import { Navbar } from '../../../layout/navbar/navbar';
+import { environment } from '../../../../environments/environment.development';
+import { Users } from '../../users/users'; //Importar Users para poder usar el método deleteUser
 import { FormsModule } from '@angular/forms'; //Importar FormsModule para usar ngModel en el formulario
 
 @Component({

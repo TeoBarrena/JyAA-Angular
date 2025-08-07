@@ -5,10 +5,11 @@ import { environment } from '../../../environments/environment.development';
 import { AuthService } from '../../auth/auth-service/auth-service';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-campanias',
-  imports: [Navbar, FormsModule, CommonModule],
+  imports: [Navbar, FormsModule, CommonModule, RouterLink],
   templateUrl: './campanias.html',
   styleUrl: './campanias.css'
 })

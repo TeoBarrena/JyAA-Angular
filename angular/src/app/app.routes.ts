@@ -1,16 +1,24 @@
 import { Routes } from '@angular/router';
+
+// Auth
 import { Login } from './auth/login/login';
+import { authGuard } from './auth/auth-service/auth-guard';
+
+// Pages
 import { Register } from './pages/register/register';
 import { Welcome } from './pages/welcome/welcome';
 import { Users } from './pages/users/users';
-import { authGuard } from './auth/auth-service/auth-guard';
-import { UserDetail } from './pages/user-detail/user-detail';
 import { Map } from './pages/map/map';
 import { Barrios } from './pages/barrios/barrios';
 import { Zonas } from './pages/zonas/zonas';
 import { Encuestadores } from './pages/encuestadores/encuestadores';
 import { Campanias } from './pages/campanias/campanias';
 import { Jornadas } from './pages/jornadas/jornadas';
+
+// Details
+import { UserDetail } from './pages/details/user-detail/user-detail';
+import { BarrioDetail } from './pages/details/barrio-detail/barrio-detail';
+import { JornadaDetail } from './pages/details/jornada-detail/jornada-detail';
 
 export const routes: Routes = [
     {path: '', redirectTo: 'login', pathMatch: 'full'},
@@ -21,8 +29,10 @@ export const routes: Routes = [
     {path: 'user/:id', component: UserDetail, canActivate: [authGuard]},
     {path: 'map', component: Map, canActivate: [authGuard]},
     {path: 'barrios', component: Barrios, canActivate: [authGuard]},
+    {path: 'barrios/:id', component: BarrioDetail, canActivate: [authGuard]},
     {path: 'zonas', component: Zonas, canActivate: [authGuard]},
     {path: 'encuestadores', component: Encuestadores, canActivate: [authGuard]},
     {path: 'campanias', component: Campanias, canActivate: [authGuard]},
     {path: 'jornadas', component: Jornadas, canActivate: [authGuard]},
+    {path: 'jornada/:id', component: JornadaDetail, canActivate: [authGuard]},
 ];
