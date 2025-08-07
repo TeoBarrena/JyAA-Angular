@@ -44,6 +44,9 @@
                     </td>
                     
                     <td class="align-middle text-center fw-semibold">
+                        <div *ngIf="campania.jornadas.length === 0">
+                            <span class="text-muted">No hay jornadas registradas</span>
+                        </div>
                         <div *ngFor="let jornada of campania.jornadas">
                           <a [routerLink]="['/jornada', jornada.id]">
                             {{ jornada.fecha }}
