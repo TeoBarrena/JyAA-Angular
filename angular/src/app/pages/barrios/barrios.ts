@@ -62,6 +62,7 @@ export class Barrios {
     };
   }
 
+  //agregar lógica para header
   addBarrio() {
     console.log('Nuevo barrio:', this.newBarrio);
     this.http.post<any>(`${environment.apiUrl}/barrios`, this.newBarrio).subscribe({
@@ -136,7 +137,7 @@ export class Barrios {
 
       // Cerrar el modal manualmente
       const modalEl = document.getElementById('editBarrioModal');
-      const modal = (window as any).bootstrap.Modal.getInstance(modalEl);
+      const modal = (window as any).Modal.getInstance(modalEl);
       modal.hide();
     },
     error: (error) => {

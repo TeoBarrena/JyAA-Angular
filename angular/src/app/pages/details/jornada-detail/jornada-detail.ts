@@ -15,6 +15,8 @@ export class JornadaDetail {
 
   jornadaId: number = 0;
   jornada: any = null;
+  campaniaId: number | null = null;
+  campania: any = null;
 
   constructor(
     private http: HttpClient,
@@ -24,6 +26,7 @@ export class JornadaDetail {
   ngOnInit() {
     this.jornadaId = Number(this.route.snapshot.paramMap.get('id'));
     this.loadJornadaDetails();
+    this.buscarCampania();
   }
 
   loadJornadaDetails() {
@@ -36,6 +39,20 @@ export class JornadaDetail {
         alert('Error al obtener los detalles de la jornada con ID: ' + this.jornadaId);
       }
     })
+  }
+  
+  buscarCampania() {
+    this.http.get<any>(`${environment.apiUrl}/campanias`).subscribe({
+      next: (campanias) => {
+        this.campania = campanias.find((c: any) =>
+          c.jornadas.some((j: any) => j.id === this.jornadaId)
+        );
+        console.log('Campaña asociada a la jornada:', this.campania);
+      },
+      error: (error) => {
+        console.error('Error al obtener las campañas:', error);
+      }
+    });
   }
 
 }

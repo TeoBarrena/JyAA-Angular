@@ -10,6 +10,7 @@
                 <div class="card-body">
                     <h5 class="card-title">{{ jornada?.id }}</h5>
                     <p class="card-text"><strong>Fecha en la que se realizó:</strong> {{ jornada.fecha }}</p>
+                    <p class="card-text"><strong>Barrio:</strong> {{ campania.barrio.nombre }}</p>
                     <p class="card-text"><strong>Zonas en las que se realizo:</strong>
                         <span *ngFor="let zona of jornada?.zonas; let i = index">
                             {{ zona.nombre }}<span *ngIf="i < jornada.zonas.length - 1">, </span>
