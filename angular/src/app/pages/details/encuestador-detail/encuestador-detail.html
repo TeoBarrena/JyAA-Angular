@@ -1,0 +1,57 @@
+
+<app-navbar></app-navbar>
+
+<div class="container mt-5">
+  <div class="row align-items-center">
+    
+    <!-- Columna del ícono/avatar -->
+    <div class="col-md-4 text-center">
+      <i class="bi bi-person-circle" style="font-size: 8rem; color: gray;"></i>
+    </div>
+
+    <!-- Columna de los datos -->
+    <div class="col-md-8">
+      <table class="table table-borderless">
+        <tbody>
+          <tr>
+            <th scope="row">Nombre</th>
+            <td>{{ encuestador.nombre }}</td>
+          </tr>
+          <tr>
+            <th scope="row">DNI</th>
+            <td>{{ encuestador.dni }}</td>
+          </tr>
+          <tr>
+            <th scope="row">Género</th>
+            <td>{{ encuestador.genero }}</td>
+          </tr>
+          <tr>
+            <th scope="row">Ocupación</th>
+            <td>{{ encuestador.ocupacion }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+     <!-- Botones editar/eliminar -->
+    <div class="mb-2 d-flex justify-content-around">
+      <div class="row w-100"> <!--Para que ocupe el 100% de ancho-->
+
+        <div class="col-md-6 d-flex justify-content-end">
+          <button class="btn btn-outline-success d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#editEncuestadorModal">
+            Editar
+            <i class="bi bi-pencil ms-2"></i>
+          </button>
+        </div>
+
+        <div class="col-md-6 d-flex justify-content-start">
+          <button class="btn btn-outline-danger d-flex align-items-center" (click)="confirmDelete(encuestador.id)">
+            Eliminar
+            <i class="bi bi-trash ms-2"></i>
+          </button>
+        </div>
+
+        </div>
+    </div>
+
+</div>

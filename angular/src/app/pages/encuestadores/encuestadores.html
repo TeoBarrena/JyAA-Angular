@@ -1,2 +1,126 @@
 
 <app-navbar></app-navbar>
+
+<div class="container mt-4">
+    <h4 class="title mb-3">Encuestadores</h4>
+
+    <div class="row mb-3" *ngIf="rolUser === 'admin'">
+        <div class="col-md-4 offset-md-8 d-flex justify-content-end">
+            <button
+                class="btn btn-primary"
+                data-bs-toggle="modal"
+                data-bs-target="#addEncuestadorModal"
+            >
+                <i class="bi bi-plus"></i> Añadir encuestador
+            </button>
+        </div>
+    </div>
+</div>
+
+
+<table class="table table-striped table-bordered table-hover table-sm">
+    <tbody>
+        <tr *ngFor="let encuestador of encuestadores">
+            <td class="align-middle text-center fw-semibold">{{ encuestador.nombre }}</td>
+
+            <td class="align middle text-center fw-semibold">{{ encuestador.dni }}</td>
+
+            <td class="align middle text-center fw-semibold">{{ encuestador.genero }}</td>
+
+            <td class="align middle text-center fw-semibold">{{ encuestador.ocupacion }}</td>
+
+            
+            <td *ngIf="rolUser === 'admin'"> 
+              <div class="mb-2 d-flex justify-content-around">
+                <button class="btn btn-outline-secondary" title="Ver" [routerLink]="['/encuestadores', encuestador.id]">
+                        <i class="bi bi-eye"></i>
+                </button>
+                <button class="btn btn-outline-danger" title="Eliminar" (click)="confirmDelete(encuestador.id)">
+                  <i class="bi bi-trash"></i>
+                </button>  
+              </div>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<!-- Modal añadir encuestador -->
+<div class="modal fade" id="addEncuestadorModal" tabindex="-1" aria-labelledby="addEncuestadorModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+
+        <div class="modal-content">
+
+            <form (ngSubmit)="addEncuestador()" #encuestadorForm="ngForm">
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addEncuestadorModalLabel">Añadir nuevo encuestador</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+
+                <div class="modal-body">
+
+                    <div class="mb-3">
+                        <label for="nombre" class="form-label">Nombre</label>
+                        <input type="text" class="form-control" id="nombre" [(ngModel)]="newEncuestador.nombre" name="nombre" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="dni" class="form-label">DNI</label>
+                        <input type="number" class="form-control" id="dni" [(ngModel)]="newEncuestador.dni" name="dni" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="ocupacion" class="form-label">Ocupación</label>
+                        <input type="text" class="form-control" id="ocupacion" [(ngModel)]="newEncuestador.ocupacion" name="ocupacion" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="genero" class="form-label">Género</label>
+                        <input type="text" class="form-control" id="genero" [(ngModel)]="newEncuestador.genero" name="genero" required>
+                    </div>
+
+                    <!-- Select para jornadas en las que estuvo -->
+                    <div class="mb-3">
+                        <label for="jornadas" class="form-label">Jornadas</label>
+                        <div class="d-flex gap-2">
+                            <select id="jornadas" class="form-select"
+                                    [(ngModel)]="selectedJornadaId"
+                                    name="selectedJornadaId">
+                                <option [ngValue]="null" disabled *ngIf="getAvailableJornadas().length > 0">Seleccione una jornada</option>
+                                <option [ngValue]="null" disabled *ngIf="getAvailableJornadas().length === 0">No hay jornadas disponibles</option>
+                                <option *ngFor="let jornada of getAvailableJornadas()" [ngValue]="jornada.id">
+                                    {{ jornada.fecha }}
+                                </option>
+                            </select>
+                            <button type="button" class="btn btn-success"
+                                (click)="addJornada()" [disabled]="!selectedJornadaId">
+                                Añadir
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Lista de jornadas seleccionadas-->
+                     <div class="mb-3 d-flex flex-wrap gap-2">
+                        <span *ngFor="let jornada of newEncuestador.jornadas" class="badge bg-primary p-2">
+                            {{ jornada.fecha}}
+                            <i class="bi bi-x ms-2" style="cursor:pointer"
+                            (click)="removeJornada(jornada.id)"></i>
+                        </span>
+                     </div>
+
+                </div>
+
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success" [disabled]="encuestadorForm.invalid">
+                        Guardar
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>

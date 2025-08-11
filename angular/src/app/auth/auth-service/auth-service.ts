@@ -1,3 +1,4 @@
+import { HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
@@ -49,6 +50,11 @@ export class AuthService {
 
   getUserRole(): string | null {
     return localStorage.getItem('userRole'); //devuelve el rol del usuario almacenado en localStorage
+  }
+
+  getHeaderHttp(): HttpHeaders {
+    const token = this.getToken();
+    return new HttpHeaders().set('Authorization', `Bearer ${token}`); //configura el header HTTP con el token JWT
   }
 
 }

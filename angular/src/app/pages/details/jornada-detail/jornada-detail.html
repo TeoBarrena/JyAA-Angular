@@ -1,0 +1,28 @@
+<app-navbar></app-navbar>
+
+
+<div class="container mt-4">
+    <h4 class="title mb-3">Detalle de la jornada</h4>
+
+    <div class="row mb-3">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">{{ jornada?.id }}</h5>
+                    <p class="card-text"><strong>Fecha en la que se realizó:</strong> {{ jornada.fecha }}</p>
+                    <p class="card-text"><strong>Barrio:</strong> {{ campania.barrio.nombre }}</p>
+                    <p class="card-text"><strong>Zonas en las que se realizo:</strong>
+                        <span *ngFor="let zona of jornada?.zonas; let i = index">
+                            {{ zona.nombre }}<span *ngIf="i < jornada.zonas.length - 1">, </span>
+                        </span>
+                    </p>
+                    <p class="card-text"><strong>Encuestadores que participaron:</strong>
+                        <span *ngFor="let encuestador of jornada?.encuestadores; let i = index">
+                            {{ encuestador.nombre }}<span *ngIf="i < jornada.encuestadores.length - 1">, </span>
+                        </span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

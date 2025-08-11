@@ -5,6 +5,7 @@ import { environment } from '../../../environments/environment.development';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../auth/auth-service/auth-service';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-barrios',
@@ -31,6 +32,7 @@ export class Barrios {
   constructor(
     private http: HttpClient,
     private auth: AuthService,
+    private router: Router,
   ){}
 
   ngOnInit() {
@@ -61,6 +63,7 @@ export class Barrios {
     };
   }
 
+  //agregar lógica para header
   addBarrio() {
     console.log('Nuevo barrio:', this.newBarrio);
     this.http.post<any>(`${environment.apiUrl}/barrios`, this.newBarrio).subscribe({
@@ -116,6 +119,10 @@ export class Barrios {
     const modal = new (window as any).bootstrap.Modal(document.getElementById('editBarrioModal'));
     modal.show();
   }
+
+  viewBarrio(barrioId: number) {
+    this.router.navigate(['/barrios/', barrioId]);
+  }
   
   guardarCambiosBarrio() {
   const token = localStorage.getItem('token');
@@ -131,7 +138,7 @@ export class Barrios {
 
       // Cerrar el modal manualmente
       const modalEl = document.getElementById('editBarrioModal');
-      const modal = (window as any).bootstrap.Modal.getInstance(modalEl);
+      const modal = (window as any).Modal.getInstance(modalEl);
       modal.hide();
     },
     error: (error) => {
