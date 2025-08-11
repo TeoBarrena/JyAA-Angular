@@ -1,0 +1,29 @@
+
+.title {
+  margin-top: 1rem;
+  margin-bottom: 1.5rem;
+  margin-left: 1rem;
+  text-align: left;
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #005a63;
+}
+
+th, td {
+  border: 1px solid #ccc;
+  padding: 0.5rem;
+  text-align: left;
+}
+
+th {
+  background-color: #005a63;
+  color: white;
+}
+
+table {
+  width: 95%;
+  margin-left: auto;
+  margin-right: auto;
+  border-collapse: collapse;
+  margin-top: 0 !important;
+}

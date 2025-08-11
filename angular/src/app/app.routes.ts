@@ -19,6 +19,7 @@ import { Jornadas } from './pages/jornadas/jornadas';
 import { UserDetail } from './pages/details/user-detail/user-detail';
 import { BarrioDetail } from './pages/details/barrio-detail/barrio-detail';
 import { JornadaDetail } from './pages/details/jornada-detail/jornada-detail';
+import { EncuestadorDetail } from './pages/details/encuestador-detail/encuestador-detail';
 
 export const routes: Routes = [
     {path: '', redirectTo: 'login', pathMatch: 'full'},
@@ -32,6 +33,7 @@ export const routes: Routes = [
     {path: 'barrios/:id', component: BarrioDetail, canActivate: [authGuard]},
     {path: 'zonas', component: Zonas, canActivate: [authGuard]},
     {path: 'encuestadores', component: Encuestadores, canActivate: [authGuard]},
+    {path: 'encuestadores/:id', component: EncuestadorDetail, canActivate: [authGuard]},
     {path: 'campanias', component: Campanias, canActivate: [authGuard]},
     {path: 'jornadas', component: Jornadas, canActivate: [authGuard]},
     {path: 'jornada/:id', component: JornadaDetail, canActivate: [authGuard]},
