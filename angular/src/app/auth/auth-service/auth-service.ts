@@ -13,6 +13,7 @@ export class AuthService {
 
   login(){
     localStorage.setItem('isLoggedIn', 'true'); //guarda el estado de inicio de sesión en localStorage
+    localStorage.setItem('pageSize', '5'); //guarda el default de cantidad de elementos por pagina
     this.loggedIn.next(true); //cambia el estado a inicio sesión
   }
 

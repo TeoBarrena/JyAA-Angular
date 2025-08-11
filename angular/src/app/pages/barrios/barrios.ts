@@ -15,6 +15,7 @@ import { FormsModule } from '@angular/forms';
 export class Barrios {
 
   barrios: any[] = [];
+  
   newBarrio = {
     nombre: '',
     descripcion: '',

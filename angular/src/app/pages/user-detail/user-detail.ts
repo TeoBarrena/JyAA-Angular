@@ -4,7 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router'; //sirve para obtener p
 import { CommonModule } from '@angular/common'; 
 import { Navbar } from '../../layout/navbar/navbar';
 import { environment } from '../../../environments/environment.development';
-import { Users } from '../users/users'; //Importar Users para poder usar el método deleteUser
+import { Usuarios } from '../usuarios/Usuarios'; //Importar Users para poder usar el método deleteUser
 import { FormsModule } from '@angular/forms'; //Importar FormsModule para usar ngModel en el formulario
 
 @Component({
@@ -33,7 +33,7 @@ export class UserDetail {
   constructor(
     private http: HttpClient,
     private route: ActivatedRoute, //Inyección de ActivatedRoute para obtener parámetros de la ruta
-    private users: Users, //Inyección del servicio Users para poder usar su método deleteUser
+    private users: Usuarios, //Inyección del servicio Users para poder usar su método deleteUser
     private router: Router,
   ){}
 

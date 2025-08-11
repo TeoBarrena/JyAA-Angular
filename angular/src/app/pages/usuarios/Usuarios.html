@@ -1,0 +1,262 @@
+<app-navbar></app-navbar>
+<div class="container pt-5 mb-4">
+  <div class="row gy-3">
+    <span class="d-flex justify-content-between align-items-center">
+      <h5 class="fw-bold text-primary ">Cuentas de Usuario</h5>
+      <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal"><i
+          class="bi bi-plus"></i>Añadir usuario</button>
+    </span>
+    <span class="d-flex justify-content-between align-items-center">
+      <div class="row flex-grow-1 gy-3">
+        <!--<form #(submit)="" class="col-12 col-lg-6 ">-->
+        <div class="col-12 col-lg-6">
+          <div class="input-group">
+            <input #searchInput type="text" class="form-control border-end-0" [(ngModel)]="emailFilter"
+              (ngModelChange)="onFilterChange()" placeholder="Filtrar por email, nombre o apellido">
+            <button class="input-group-text bg-white border-start-0" type="submit">
+              <i class="bi bi-search text-muted"></i>
+            </button>
+          </div>
+        </div>
+        <!--
+        </form>-->
+        <div class="col-12 col-lg-2">
+          <select class="form-select " [(ngModel)]="organizacionFilter" (ngModelChange)="onFilterChange()">
+            <option class="text-muted" value="">Organización</option>
+            <option *ngFor="let org of organizaciones" [value]="org.nombre">
+              {{ org.nombre }}
+            </option>
+          </select>
+        </div>
+        <div class="col-12 col-lg-2">
+          <select class="form-select " [(ngModel)]="tipoFilter" (ngModelChange)="onFilterChange()">
+            <option class="text-muted" value="">Tipo</option>
+            <option value="Personal de Salud">Personal de Salud</option>
+            <option value="Miembro de Organización Civil">Miembro de Organización Civil</option>
+            <option value="Admin">Admin</option>
+          </select>
+        </div>
+        <div class="col-12 col-lg-2">
+          <select class="form-select " [(ngModel)]="estadoFilter" (ngModelChange)="onFilterChange()">
+            <option class="text-muted" value="">Estado</option>
+            <option value="HABILITADO">Habilitado</option>
+            <option value="DESHABILITADO">Deshabilitado</option>
+            <option value="PENDIENTE">Pendiente</option>
+          </select>
+        </div>
+      </div>
+    </span>
+
+    <div class="table-responsive" *ngIf="users.length === 0">
+      <table class="table table-hover nomidborder-table ">
+        <tbody>
+          <tr  *ngFor="let num of [].constructor(selectedPageSize); let i = index">
+            <td>
+              <div class="placeholder-glow mb-0">
+                <span class="placeholder w-100 h-100"></span>
+              </div>
+            </td>
+            <td  style="min-width:170px; width:170px;">
+              <div class="placeholder-glow mb-0">
+                <span class="placeholder w-100 h-100"></span>
+              </div>
+            </td>
+            <td style="min-width:300px; width:300px;">
+              <div class="placeholder-glow mb-0">
+                <span class="placeholder w-100 h-100"></span>
+              </div>
+            </td>
+            <td  style="min-width:200px; width:200px;">
+              <div class="placeholder-glow mb-0">
+                <span class="placeholder w-100 h-100"></span>
+              </div>
+            </td>
+            <td style="min-width:40px; width:40px;">
+              <div class="placeholder-glow mb-0">
+                <span class="placeholder w-100 h-100"></span>
+              </div>
+            </td>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="table-responsive" *ngIf="paginatedUsers && paginatedUsers.length > 0">
+      <table class="table table-hover nomidborder-table " >
+        <tbody>
+          <tr *ngFor="let user of paginatedUsers">
+            <td (click)="viewUser(user.id)" [ngStyle]="{ cursor: 'pointer' }">{{ user.email }}</td>
+            <td (click)="viewUser(user.id)" [ngStyle]="{ cursor: 'pointer' }">{{ user.nombre }} {{ user.apellido }}</td>
+            <td>{{
+              user.matricula && user.organizacion
+              ? 'Personal de Salud / ' + user.organizacion.nombre
+              : user.matricula
+              ? 'Personal de Salud'
+              : user.organizacion
+              ? user.organizacion.nombre
+              : 'Admin'
+              }}</td>
+
+            <td class="p-0" style="min-width: 200px; width:200px;">
+              <!-- PONER EL ONCHANGE PARA ACTUALIZAR EL USUARIO -->
+              <select [(ngModel)]="user.estado" class="form-select text-center border-0 rounded-0 h-100 w-100 p-2"
+                [ngClass]="{
+                  'bg-success-subtle': user.estado === 'HABILITADO',
+                  'bg-danger-subtle': user.estado === 'DESHABILITADO',
+                  'bg-warning-subtle': user.estado === 'PENDIENTE'
+                }" (change)="cambiarEstado(user.id,user.estado)" *ngIf="user.id != currentUserId">
+                <option [value]="'HABILITADO'">Habilitado</option>
+                <option [value]="'DESHABILITADO'">Deshabilitado</option>
+                <option [value]="'PENDIENTE'">Pendiente</option>
+              </select>
+            </td>
+
+            <td class="p-0" style="min-width:40; width:40px;">
+              <button
+                class="w-100 p-2 border-0 rounded-0 h-100 btn btn-outline-danger d-flex justify-content-center align-items-center fw-bold"
+                (click)="confirmDelete(user.id)" *ngIf="user.id != currentUserId">
+                <i class="bi bi-trash"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="align-self-end ps-3 mt-4" *ngIf="users.length > 0 && paginatedUsers.length === 0">No hay usuarios que coincidan con el filtro</p>
+
+    <!-- Paginación y cantidad de usuarios -->
+    <span class="mx-auto row gy-3 mt-0 d-flex justify-content-center align-items-center">
+      <div class="col-12 col-lg-4 mx-auto me-lg-auto ms-lg-0 p-lg-0">
+        <div class="mx-auto me-lg-auto ms-lg-0 d-flex justify-content-center align-items-center">
+          <label for="pageSize">Usuarios por página:</label>
+          <input type="number" class="form-control form-control-sm ms-2" min="1" max="15" id="pageSize"
+            style="width:50px;" [(ngModel)]="selectedPageSize" (ngModelChange)="changePageSize($event)">
+          <!--<select class="form-select form-select-sm" id="pageSize" [(ngModel)]="selectedPageSize" (ngModelChange)="changePageSize($event)">
+                  <option *ngFor="let size of pageSizeOptions" [value]="size">{{size}}</option>
+                </select>-->
+
+        </div>
+      </div>
+      <nav class="col" *ngIf="paginatedUsers && paginatedUsers.length > 0">
+        <ul class="pagination my-auto  d-flex justify-content-center align-items-center">
+          <li class="page-item" [class.disabled]="currentPage === 1">
+            <button class="page-link" (click)="prevPage()">Anterior</button>
+          </li>
+
+          <li class="page-item" *ngFor="let page of getPageNumbersToShow()" [class.active]="page === currentPage">
+            <button class="page-link" (click)="goToPage(page)">{{ page }}</button>
+          </li>
+
+          <li class="page-item" [class.disabled]="currentPage === getTotalPages()">
+            <button class="page-link" (click)="nextPage()">Siguiente</button>
+          </li>
+
+        </ul>
+      </nav>
+    </span>
+  </div>
+</div>
+<!-- Modal agregar usuario -->
+<div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title" id="addUserModalLabel">Añadir nuevo usuario</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar" id="closeModalBtn"
+          (click)="resetForm()"></button>
+      </div>
+
+      <div class="modal-body">
+        <form class="row gy-3">
+          <div class="col-12 col-md-6">
+            <div class="row">
+              <label for="nombre" class="col-12 col-form-label">Nombre</label>
+              <div class="col-12">
+                <input type="text" class="form-control" id="nombre" [(ngModel)]="newUser.nombre" name="nombre">
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12 col-md-6">
+            <div class="row">
+              <label for="apellido" class="col-12 col-form-label">Apellido</label>
+              <div class="col-12 ">
+                <input type="text" class="form-control" id="apellido" [(ngModel)]="newUser.apellido" name="apellido">
+              </div>
+            </div>
+          </div>
+
+
+          <div class="col-12">
+            <div class="row">
+              <label for="email" class="col-md-2 col-form-label">Email</label>
+              <div class="col-12 col-md-10"> <input type="email" class="form-control" id="email"
+                  [(ngModel)]="newUser.email" name="email">
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12">
+            <div class="row">
+              <label for="password" class="col-12 col-md-4 col-form-label">Contraseña</label>
+              <div class="col-12 col-md-8">
+                <input type="password" class="form-control" id="password" [(ngModel)]="newUser.password"
+                  name="password" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Administrador -->
+          <div class="col-12">
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" [(ngModel)]="newUser.admin" name="admin"
+                (change)="onAdminChange()" />
+              <label class="form-check-label">Administrador</label>
+            </div>
+          </div>
+
+          <!-- Personal de Salud -->
+          <div class="col-12">
+            <div class=" form-check">
+              <input type="checkbox" class="form-check-input" [(ngModel)]="newUser.personalSalud" name="personalSalud"
+                [disabled]="newUser.admin" (change)="onPersonalSaludChange()" />
+              <label class="form-check-label">Personal de Salud</label>
+            </div>
+
+            <div *ngIf="newUser.personalSalud" class="mt-2">
+              <input type="number" placeholder="Número de matrícula" [(ngModel)]="newUser.matricula" name="matricula"
+                class="form-control" />
+            </div>
+
+          </div>
+
+          <!-- Miembro de Organización -->
+          <div class="col-12">
+            <div class=" form-check">
+              <input type="checkbox" class="form-check-input" [(ngModel)]="newUser.miembroOrg" name="miembroOrg"
+                [disabled]="newUser.admin" (change)="onMiembroOrgChange()" />
+              <label class="form-check-label">Miembro de una organización</label>
+            </div>
+
+            <select *ngIf="newUser.miembroOrg" [(ngModel)]="newUser.organizacion" name="organizacion"
+              class="form-select mt-2">
+              <option disabled selected value="">Organización social</option>
+              <option *ngFor="let org of organizaciones" [ngValue]="org">
+                {{ org.nombre }}
+              </option>
+            </select>
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="resetForm()">Cancelar</button>
+        <button type="button" class="btn btn-primary" (click)="guardarNuevoUsuario()"
+          [disabled]="!formularioValido">Guardar</button>
+
+      </div>
+
+    </div>
+  </div>
+</div>

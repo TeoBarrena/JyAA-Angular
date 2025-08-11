@@ -1,0 +1,12 @@
+<div class="mt-2 toast align-items-center w-100 fade show {{ bgClass }} {{ textClass }}" role="alert" aria-live="assertive" aria-atomic="true" >
+  <div class="d-flex align-items-center px-2">
+    <i class="{{ iconClass }} display-6 my-1 mx-2"></i>
+    <div class="toast-body text-break overflow-hidden flex-grow-1">
+      {{ message }}
+    </div>
+    <button type="button" class="btn btn-link me-2 ms-auto p-0  fs-5 fw-bold {{ textClass }} text-nowrap" aria-label="Close" (click)="onClose()">
+      <i class="bi bi-x-lg"></i>
+    </button>
+
+  </div>
+</div>

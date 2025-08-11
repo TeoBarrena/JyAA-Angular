@@ -1,47 +1,86 @@
- <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-     crossorigin=""/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
 
-<nav class="navbar navbar-expand-md navbar-light bg-white border-bottom shadow-sm py-2 px-4">
+<nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom shadow-sm py-2 px-4">
   <div class="container-fluid">
 
     <!-- Logo a la izquierda -->
     <div class="d-flex align-items-center me-auto">
       <a routerLink="/welcome">
-        <img src="/logo.png" alt="Logo" class="logo-img me-2"/>
+        <img src="/logo.png" alt="Logo" class="logo-img me-2" />
       </a>
     </div>
 
-    <!-- Botón hamburguesa para mobile -->
+    <!-- Botón hamburguesa para mobile (Cómo hamburguesa??? Jajajaja)-->
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
       <span class="navbar-toggler-icon"></span>
     </button>
 
     <!-- Sección colapsable -->
     <div class="collapse navbar-collapse" id="navbarNav" *ngIf="auth.isLoggedIn()">
-      
+
       <!-- Menú centrado -->
       <ul class="navbar-nav mx-auto align-items-center">
+
         <li class="nav-item"><a class="nav-link text-dark" routerLink="/map">Mapa</a></li>
-        <li class="nav-item"><a class="nav-link text-dark" routerLink="/users">Usuarios</a></li>
+
+        <!--<li class="nav-item"><a class="nav-link text-dark" routerLink="/users">Usuarios</a></li>-->
+        <li class="nav-item"><a class="nav-link text-dark" routerLink="/usuarios">Usuarios</a></li>
+
         <li class="nav-item"><a class="nav-link text-dark" routerLink="/barrios">Barrios</a></li>
+
         <li class="nav-item"><a class="nav-link text-dark" routerLink="/zonas">Zonas</a></li>
+
         <li class="nav-item"><a class="nav-link text-dark" routerLink="/encuestadores">Encuestadores</a></li>
+
         <li class="nav-item"><a class="nav-link text-dark" routerLink="/campanias">Campañas</a></li>
+
         <li class="nav-item"><a class="nav-link text-dark" routerLink="/jornadas">Jornadas</a></li>
+
+          <li class="nav-item d-inline d-md-none">
+            <a class="nav-link text-dark" (click)="logout()">
+              <i class="bi bi-box-arrow-left fs-2 fw-bold me-2 my-0 py-0"></i> Cerrar sesión
+            </a>
+          </li>
+          <li class="nav-item d-block d-md-none">
+            <a class="nav-link text-dark" routerLink="/perfil">
+              <i class="bi bi-person-circle fs-2 text-primary fw-bold me-2 my-0 py-0"></i> Perfil
+            </a>
+          </li>
       </ul>
 
+      
+        <ul class="d-none d-md-block navbar-nav align-items-center">
+          <li class="nav-item">
+            <i class="bi bi-box-arrow-left fs-4 fw-bold " (click)="logout()"></i>
+          </li>
+          <li class="nav-item dropdown">
+            <button class="btn btn-primary rounded-circle" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="bi bi-person fs-4 fw-bold"></i>
+            </button>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="#">Action</a></li>
+              <li><a class="dropdown-item" href="#">Another action</a></li>
+              <li><a class="dropdown-item" href="#">Something else here</a></li>
+            </ul>
+          </li>
+
+        </ul>
+      
       <!-- Íconos a la derecha -->
       <div class="d-flex align-items-center ms-auto gap-2">
-        <img src="/cerrar-sesion.png" alt="Cerrar sesión" class="icon-img" (click)="logout()" />
+        
+        <!--
+          <img src="/cerrar-sesion.png" alt="Cerrar sesión" class="icon-img" (click)="logout()" />-->
+        <!--
         <div class="user-icon">
           <img src="/logo-usuario.png" alt="Perfil" style="width: 30px; height: 30px;" />
-        </div>
+        </div>-->
       </div>
     </div>
 
-    <div *ngIf="showLoginButton()" class="ms-auto">
-      <a routerLink="/login" class="btn btn-outline-primary">Iniciar sesión</a>
+    <div *ngIf="showLoginButton()" class="ms-auto nav-item">
+      <a routerLink="/login" class="nav-link ">Iniciar sesión</a>
     </div>
 
   </div>
