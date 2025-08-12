@@ -18,6 +18,10 @@
             <td>{{ encuestador.nombre }}</td>
           </tr>
           <tr>
+            <th scope="row">Fecha de nacimiento</th>
+            <td>{{ encuestador.nacimiento }}</td>
+          </tr>
+          <tr>
             <th scope="row">DNI</th>
             <td>{{ encuestador.dni }}</td>
           </tr>
@@ -29,6 +33,20 @@
             <th scope="row">Ocupación</th>
             <td>{{ encuestador.ocupacion }}</td>
           </tr>
+
+          <tr>
+            <th scope="row">Jornadas en las que participo</th>
+            <td>
+              <span *ngFor="let jornada of encuestador.jornadas">
+                <li class="list-styled">
+                  <a [routerLink]="['/jornada', jornada.id]" class="text-decoration-none">
+                    {{ jornada.fecha | date: 'dd/MM/yyyy' }}
+                  </a>
+                </li>
+              </span>
+            </td>
+          </tr>
+          
         </tbody>
       </table>
     </div>
