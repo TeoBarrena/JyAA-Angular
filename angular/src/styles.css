@@ -4,8 +4,34 @@
 * {
   font-family: 'Montserrat', sans-serif;
 }
+.form-control-plaintext {
+  cursor: default !important;
+}
+
 
 /* Buttons */
+.btn-outline-primary {
+  color: #005a63 !important;            /* Text color */
+  border-color: #005a63 !important;     /* Border color */
+  background-color: transparent !important;
+}
+
+.btn-outline-primary:hover,
+.btn-outline-primary:focus,
+.btn-outline-primary:active,
+.btn-outline-primary.active {
+  color: #fff !important;                /* Text color on hover/focus/active */
+  background-color: #00434a !important; /* Background color on hover/focus/active */
+  border-color: #00434a !important;     /* Border color on hover/focus/active */
+}
+
+.btn-outline-primary:disabled {
+  color: #005a63 !important;             /* Text color when disabled */
+  border-color: #005a63 !important;
+  background-color: transparent !important;
+  opacity: 0.65;
+}
+
 .btn-primary {
   background-color: #005a63 !important;
   border-color: #005a63 !important;

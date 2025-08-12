@@ -1,10 +1,127 @@
 <app-navbar></app-navbar>
 <div class="container pt-5 mb-4">
-  <div class="row gy-3">
-    <span class="d-flex justify-content-between align-items-center">
-      <h5 class="fw-bold text-primary ">Barrios</h5>
-      <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal"><i
-          class="bi bi-plus"></i>Añadir barrio</button>
-    </span>
-  </div>
+    <div class="row gy-3">
+        <span class="d-flex justify-content-between align-items-center">
+            <h5 class="fw-bold text-primary ">Barrios</h5>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addBarrioModal"><i
+                    class="bi bi-plus"></i>Añadir barrio</button>
+        </span>
+        <div class="col-12">
+            <div class="row gy-4 row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4 row-cols-xxl-5  ">
+                <div class="col" *ngFor="let barrio of barrios">
+                    <div class="card card-lista shadow-sm" (click)="openDetalle(barrio)">
+                        <div class="card-img-top bg-primary" style="height: 9rem;">
+<div id="{{barrio.id}}map" class="w-100 h-100"></div></div>
+                        <div class="card-body d-flex flex-column" style="min-height: 9rem;">
+                            <h5 class="card-title">{{barrio.nombre}}</h5>
+                            <p class="card-text"><small>{{ barrio.descripcion }}</small></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal detalle / editar -->
+    <div class="modal fade" id="modalDetalle" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-fullscreen-md-down modal-xl">
+            <div class="modal-content">
+                <div class="card border-0 w-100">
+                    <div class="row g-0" style="min-height: 75vh;">
+                        <div class="col-md-6" style="min-height: 25vh;">
+                            <div class="img-fluid rounded-start bg-primary h-100"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card-body d-flex flex-column justify-content-between w-100 h-100 p-4">
+                                <div class="row g-3">
+                                    <span class="col-12 card-title d-flex justify-content-between align-items-center py-2 ">
+                                        <!-- Nombre -->
+                                        <input type="text" [class.form-control-plaintext]="!editMode"
+                                            [class.form-control]="editMode" [readonly]="!editMode"
+                                            [(ngModel)]="selectedBarrio.nombre" placeholder="Nombre"
+                                            class="my-auto fs-4 me-4" />
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                    </span>
+
+                                    <div class="col-12 ">
+                                        <!-- Descripción -->
+                                        <textarea [class.form-control-plaintext]="!editMode"
+                                            [class.form-control]="editMode" [readonly]="!editMode"
+                                            [(ngModel)]="selectedBarrio.descripcion" placeholder="Descripción" rows="3"
+                                            style="resize: none;">
+                                        </textarea>
+                                    </div>
+
+                                    <label class="col-sm-3 col-form-label" for="latitudDetalle">Latitud</label>
+                                    <div class="col-sm-9">
+                                        <!-- Latitud -->
+                                        <input id="latitudDetalle" type="text"
+                                            [class.form-control-plaintext]="!editMode" [class.form-control]="editMode"
+                                            [readonly]="!editMode" [(ngModel)]="selectedBarrio.centroGeografico.latitud"
+                                            placeholder="Latitud" />
+
+                                    </div>
+
+                                    <label class="col-sm-3 col-form-label" for="longitudDetalle">Longitud</label>
+                                    <div class="col-sm-9">
+                                        <!-- Longitud -->
+                                        <input id="longitudDetalle" type="text"
+                                            [class.form-control-plaintext]="!editMode" [class.form-control]="editMode"
+                                            [readonly]="!editMode"
+                                            [(ngModel)]="selectedBarrio.centroGeografico.longitud"
+                                            placeholder="Longitud" />
+
+                                    </div>
+
+                                    <label class="col-sm-3 col-form-label" for="zonasDetalle">Zonas</label>
+                                    <ul class="col-sm-9 list-group py-1 px-2" *ngIf="selectedBarrio?.zonas?.length > 0">
+                                        <li class="list-group-item py-1" *ngFor="let zona of selectedBarrio.zonas">
+                                            {{ zona.nombre }}
+                                        </li>
+                                    </ul>
+                                    <small class="col-sm-9 text-muted py-2"
+                                        *ngIf="selectedBarrio?.zonas?.length === 0">No hay zonas registradas para este
+                                        barrio.</small>
+                                </div>
+
+
+                                <!-- Botones -->
+                                <span class="d-flex justify-content-end align-self-end" *ngIf="rolUser === 'admin'">
+                                    <!-- Botones de solo lectura -->
+                                    <ng-container *ngIf="!editMode">
+                                        <button class="btn btn-outline-primary me-2" title="Editar"
+                                            (click)="enableEdit()">
+                                            <i class="bi bi-pencil"></i> Editar
+                                        </button>
+                                        <button class="btn btn-outline-danger" title="Eliminar"
+                                            (click)="confirmDelete(selectedBarrio.id)">
+                                            <i class="bi bi-trash"></i> Eliminar
+                                        </button>
+                                    </ng-container>
+
+                                    <!-- Botones en modo edición -->
+                                    <ng-container *ngIf="editMode">
+                                        <button class="btn btn-outline-success me-2" (click)="saveEdit()">
+                                            <i class="bi bi-check-lg"></i> Aceptar
+                                        </button>
+                                        <button class="btn btn-outline-secondary" (click)="cancelEdit()">
+                                            <i class="bi bi-x-lg"></i> Cancelar
+                                        </button>
+                                    </ng-container>
+                                </span><!--
+                                <span class="d-flex justify-content-end align-self-end" *ngIf="rolUser === 'admin'">
+                                    <button class="btn btn-outline-primary me-2" title="Editar">
+                                        <i class="bi bi-pencil"></i> Editar
+                                    </button>
+                                    <button class="btn btn-outline-danger" title="Eliminar">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </span>-->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
