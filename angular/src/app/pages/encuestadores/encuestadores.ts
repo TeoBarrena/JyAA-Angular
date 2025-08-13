@@ -17,13 +17,24 @@ import { RouterLink } from '@angular/router';
 })
 export class Encuestadores {
 
+  //almacenar encuestadores/jornadas
   encuestadores: any[] = [];
+  jornadas: any[] = [];
+  paginatedEncuestadores: any[] = [];
 
+  //rol del usuario para mostrar u ocultar botones
   rolUser: string | null = null;
 
-  jornadas: any[] = [];
-
   selectedJornadaId: number | null = null; //esto para el select de jornadas, y no ingresar repetidas
+
+  //Paginación
+  currentPage: number = 1;
+  selectedPageSize: number = parseInt(localStorage.getItem('pageSize') || '5', 10);
+  
+  filtered: any[] = [];
+
+  //filtrado
+  dniFilter: string = '';
 
   newEncuestador: any = {
     nombre: '',
@@ -50,6 +61,7 @@ export class Encuestadores {
         this.encuestadores = data;
         console.log('Encuestadores: ', data);
         this.getJornadas();
+        this.updatePaginatedEncuestadores();
       },
       error: (error) => {
         console.error('Error fetching encuestadores:', error);
@@ -149,6 +161,71 @@ export class Encuestadores {
         alert('Error al crear el encuestador. Por favor, inténtelo de nuevo más tarde.');
       }
     });
+  }
+
+  getFilteredEncuestadores() {
+    const filtered = this.encuestadores.filter(encuestador => 
+    (
+      !this.dniFilter || encuestador.dni.toString().includes(this.dniFilter)
+    )
+    );
+    return filtered;
+  }
+
+  updatePaginatedEncuestadores() {
+    this.filtered = this.getFilteredEncuestadores();
+    const start = (this.currentPage - 1) * this.selectedPageSize;
+    const end = start + this.selectedPageSize;
+    this.paginatedEncuestadores = this.filtered.slice(start, end);
+  }
+
+  onFilterChange() {
+    this.currentPage = 1;
+    this.updatePaginatedEncuestadores();
+  }
+
+  changePageSize(size: number) {
+    this.selectedPageSize = Number(size);
+    localStorage.setItem('pageSize', size.toString());
+    this.currentPage = 1;
+    this.updatePaginatedEncuestadores();
+  }
+
+  prevPage() {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.updatePaginatedEncuestadores();
+    }
+  }
+
+  nextPage() {
+    if ((this.currentPage * this.selectedPageSize) < this.filtered.length){
+      this.currentPage++;
+      this.updatePaginatedEncuestadores();
+    }
+  }
+
+  goToPage(page: number): void {
+    this.currentPage = page;
+    this.updatePaginatedEncuestadores();
+  }
+
+  getTotalPages(): number {
+    return Math.ceil(this.filtered.length / this.selectedPageSize);
+  }
+
+   getPageNumbersToShow(): number[] {
+    const totalPages = this.getTotalPages();
+    const pages: number[] = [];
+
+    const start = Math.max(1, this.currentPage - 2);
+    const end = Math.min(totalPages, this.currentPage + 2);
+
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+
+    return pages;
   }
 
 
