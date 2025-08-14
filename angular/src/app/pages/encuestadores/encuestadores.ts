@@ -48,7 +48,7 @@ export class Encuestadores {
     this.http.get<any>(`${environment.apiUrl}/encuestadores`).subscribe({
       next: (data) => {
         this.encuestadores = data;
-        console.log('Encuestadores: ', data);
+        //console.log('Encuestadores: ', data);
         this.getJornadas();
       },
       error: (error) => {
@@ -62,7 +62,7 @@ export class Encuestadores {
     this.http.get<any>(`${environment.apiUrl}/jornadas`).subscribe({
       next: (data) => {
         this.jornadas = data;
-        console.log('Jornadas: ', data);
+        //console.log('Jornadas: ', data);
       },
       error: (error) => {
         console.error('Error fetching jornadas:', error);
@@ -94,9 +94,9 @@ export class Encuestadores {
 
   confirmDelete(id: number) {
     if (confirm('¿Estás seguro de que deseas eliminar este encuestador?')){
-      console.log('ID: ', id);
+      //console.log('ID: ', id);
       const headers = this.auth.getHeaderHttp();
-      console.log('Headers: ', headers);
+      //console.log('Headers: ', headers);
       this.http.delete(`${environment.apiUrl}/encuestadores/deleteEncuestador/${id}`, { headers }).subscribe({
         next: () => {
           alert('Encuestador eliminado correctamente.');

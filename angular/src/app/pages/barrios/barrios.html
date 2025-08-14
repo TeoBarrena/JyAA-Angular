@@ -3,15 +3,49 @@
     <div class="row gy-3">
         <span class="d-flex justify-content-between align-items-center">
             <h5 class="fw-bold text-primary ">Barrios</h5>
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addBarrioModal"><i
-                    class="bi bi-plus"></i>Añadir barrio</button>
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addBarrioModal"
+                (click)="openNew()"><i class="bi bi-plus me-2"></i>Añadir barrio</button>
         </span>
+
         <div class="col-12">
-            <div class="row gy-4 row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4 row-cols-xxl-5  ">
-                <div class="col" *ngFor="let barrio of barrios">
-                    <div class="card card-lista shadow-sm" (click)="openDetalle(barrio)">
+            <!-- Placeholders mientras carga -->
+            <div class="row gy-4 row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4 row-cols-xxl-5  "
+                *ngIf="barrios.length === 0">
+                <div class="col" *ngFor="let num of [].constructor(3); let i = index">
+                    <div class="card card-lista shadow-sm" (click)="openDetalle(i)">
+                        <div class="card-img-top bg-primary d-flex justify-content-center align-items-center"
+                            style="height: 9rem;">
+                            <div class="spinner-border text-light" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                        <div class="card-body d-flex flex-column" style="min-height: 9rem;">
+                            <div class="w-50">
+                                <div class="placeholder-glow mb-0">
+                                    <span class="placeholder w-100 h-100"></span>
+                                </div>
+                            </div>
+                            <div class="w-100">
+                                <div class="placeholder-glow mb-0">
+                                    <span class="placeholder w-100 h-100"></span>
+                                </div>
+                                <div class="placeholder-glow mb-0">
+                                    <span class="placeholder w-100 h-100"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lista real de barrios -->
+            <div class="row gy-4 row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4 row-cols-xxl-5  "
+                *ngIf="barrios && barrios.length > 0">
+                <div class="col" *ngFor="let barrio of barrios; let i = index">
+                    <div class="card card-lista shadow-sm" (click)="openDetalle(i)">
                         <div class="card-img-top bg-primary" style="height: 9rem;">
-<div id="{{barrio.id}}map" class="w-100 h-100"></div></div>
+                            <div id="{{barrio.id}}map" class="w-100 h-100"></div>
+                        </div>
                         <div class="card-body d-flex flex-column" style="min-height: 9rem;">
                             <h5 class="card-title">{{barrio.nombre}}</h5>
                             <p class="card-text"><small>{{ barrio.descripcion }}</small></p>
@@ -23,17 +57,24 @@
     </div>
     <!-- Modal detalle / editar -->
     <div class="modal fade" id="modalDetalle" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-fullscreen-md-down modal-xl">
+        <div class="modal-dialog modal-dialog-centered modal-fullscreen-lg-down modal-xl">
             <div class="modal-content">
                 <div class="card border-0 w-100">
                     <div class="row g-0" style="min-height: 75vh;">
                         <div class="col-md-6" style="min-height: 25vh;">
-                            <div class="img-fluid rounded-start bg-primary h-100"></div>
+                            <div class="img-fluid rounded-start bg-primary h-100 position-relative">
+                                <div class="spinner-border text-light position-absolute top-50 start-50 translate-middle"
+                                    role="status" *ngIf="modalMap === null">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <div id="modalMap" class="w-100 h-100"></div>
+                            </div>
                         </div>
                         <div class="col-md-6">
                             <div class="card-body d-flex flex-column justify-content-between w-100 h-100 p-4">
                                 <div class="row g-3">
-                                    <span class="col-12 card-title d-flex justify-content-between align-items-center py-2 ">
+                                    <span
+                                        class="col-12 card-title d-flex justify-content-between align-items-center py-2 ">
                                         <!-- Nombre -->
                                         <input type="text" [class.form-control-plaintext]="!editMode"
                                             [class.form-control]="editMode" [readonly]="!editMode"
@@ -55,7 +96,7 @@
                                     <label class="col-sm-3 col-form-label" for="latitudDetalle">Latitud</label>
                                     <div class="col-sm-9">
                                         <!-- Latitud -->
-                                        <input id="latitudDetalle" type="text"
+                                        <input id="latitudDetalle" type="number"
                                             [class.form-control-plaintext]="!editMode" [class.form-control]="editMode"
                                             [readonly]="!editMode" [(ngModel)]="selectedBarrio.centroGeografico.latitud"
                                             placeholder="Latitud" />
@@ -65,7 +106,7 @@
                                     <label class="col-sm-3 col-form-label" for="longitudDetalle">Longitud</label>
                                     <div class="col-sm-9">
                                         <!-- Longitud -->
-                                        <input id="longitudDetalle" type="text"
+                                        <input id="longitudDetalle" type="number"
                                             [class.form-control-plaintext]="!editMode" [class.form-control]="editMode"
                                             [readonly]="!editMode"
                                             [(ngModel)]="selectedBarrio.centroGeografico.longitud"
@@ -73,10 +114,35 @@
 
                                     </div>
 
-                                    <label class="col-sm-3 col-form-label" for="zonasDetalle">Zonas</label>
+                                    <label class="col-12 col-sm-3 col-form-label" for="zonasDetalle">
+                                        <div class="me-auto">
+                                            <p>Zonas</p>
+                                        </div>
+                                        <button class="btn btn-light w-100 p-0 mx-auto" *ngIf="editMode"
+                                            data-bs-toggle="modal" data-bs-target="#modalAgregarZona"
+                                            (click)="abrirModalAgregarZona()">
+                                            <i class="bi bi-plus-lg fw-bold fs-5"></i>
+                                        </button>
+
+                                    </label>
                                     <ul class="col-sm-9 list-group py-1 px-2" *ngIf="selectedBarrio?.zonas?.length > 0">
-                                        <li class="list-group-item py-1" *ngFor="let zona of selectedBarrio.zonas">
-                                            {{ zona.nombre }}
+                                        <li class="list-group-item p-0 d-flex"
+                                            *ngFor="let zona of selectedBarrio.zonas; let i = index">
+                                            <input type="color"
+                                                class="form-control form-control-color rounded-0 border-0 p-2 h-100 bg-white"
+                                                id="colorZona{{ zona.id }}" value="#fffff" disabled
+                                                style="max-width: 40px;">
+                                            <div class="ms-1 me-auto my-2">{{ zona.nombre }}</div>
+                                            <button
+                                                class="btn btn-light  h-100 m-0 rounded-start-0 border-end-0 rounded-end-0"
+                                                *ngIf="editMode" data-bs-toggle="modal"
+                                                data-bs-target="#modalAgregarZona" (click)="editarZonaExistente(i)">
+                                                <i class="bi bi-pencil fw-bold fs-6  "></i>
+                                            </button>
+                                            <button class="btn btn-light  h-100 m-0 rounded-start-0 " *ngIf="editMode"
+                                                (click)="confirmDeleteZona(zona.id)">
+                                                <i class="bi bi-trash fw-bold fs-6  "></i>
+                                            </button>
                                         </li>
                                     </ul>
                                     <small class="col-sm-9 text-muted py-2"
@@ -86,7 +152,8 @@
 
 
                                 <!-- Botones -->
-                                <span class="d-flex justify-content-end align-self-end" *ngIf="rolUser === 'admin'">
+                                <span class="d-flex justify-content-end align-self-end mt-4"
+                                    *ngIf="rolUser === 'admin'">
                                     <!-- Botones de solo lectura -->
                                     <ng-container *ngIf="!editMode">
                                         <button class="btn btn-outline-primary me-2" title="Editar"
@@ -108,15 +175,175 @@
                                             <i class="bi bi-x-lg"></i> Cancelar
                                         </button>
                                     </ng-container>
-                                </span><!--
-                                <span class="d-flex justify-content-end align-self-end" *ngIf="rolUser === 'admin'">
-                                    <button class="btn btn-outline-primary me-2" title="Editar">
-                                        <i class="bi bi-pencil"></i> Editar
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal agregar zona --><!-- Modal Agregar Zona -->
+    <div class="modal fade" id="modalAgregarZona" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-fullscreen-lg-down modal-xl">
+            <div class="modal-content">
+                <div class="card border-0 w-100">
+                    <div class="row g-0" style="min-height: 75vh;">
+                        <!-- MAPA -->
+                        <div class="col-md-6" style="min-height: 25vh;">
+                            <div class="img-fluid rounded-start bg-primary h-100 position-relative">
+                                <div class="spinner-border text-light position-absolute top-50 start-50 translate-middle"
+                                    role="status" *ngIf="modalMapNuevaZona === null">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <div id="modalMapNuevaZona" class="w-100 h-100"></div>
+                            </div>
+                        </div>
+
+                        <!-- FORMULARIO -->
+                        <div class="col-md-6">
+                            <div class="card-body d-flex flex-column justify-content-between w-100 h-100 p-4">
+                                <div class="row g-3">
+
+                                    <!-- Nombre -->
+                                    <div class="col-12">
+                                        <label class="form-label">Nombre de la zona</label>
+                                        <input type="text" class="form-control" [(ngModel)]="nuevaZona.nombre"
+                                            placeholder="Ingrese un nombre" />
+                                    </div>
+
+                                    <!-- Centro geográfico -->
+                                    <div class="col-6">
+                                        <label class="form-label">Latitud Centro</label>
+                                        <input type="number" class="form-control"
+                                            [(ngModel)]="nuevaZona.centroGeografico.latitud" />
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label">Longitud Centro</label>
+                                        <input type="number" class="form-control"
+                                            [(ngModel)]="nuevaZona.centroGeografico.longitud" />
+                                    </div>
+
+                                    <!-- Lista de puntos -->
+                                    <div class="col-12">
+                                        <label class="form-label">Puntos del área</label>
+                                        <ul class="list-group">
+                                            <li *ngFor="let punto of nuevaZona.area.puntos; let i = index"
+                                                class="list-group-item d-flex justify-content-between align-items-center">
+                                                <span class="row">
+                                                    <div
+                                                        class="col-2 d-flex align-items-center col-2 justify-content-center">
+                                                        <i class="bi bi-geo-alt-fill text-danger fs-4"></i>
+
+                                                    </div>
+                                                    <div class="col-10">
+                                                        <p class="m-0">{{ punto.latitud }}</p>
+                                                        <p class="m-0">{{ punto.longitud }}</p>
+                                                    </div>
+                                                </span>
+                                                <button class="btn btn-sm btn-outline-danger border-0"
+                                                    (click)="eliminarPunto(i)">
+                                                    <i class="bi bi-x-lg fs-6"></i>
+                                                </button>
+                                            </li>
+                                        </ul>
+                                        <small class="text-muted">Click en el mapa para agregar puntos</small>
+                                    </div>
+
+                                </div>
+
+                                <!-- Botones -->
+                                <span class="d-flex justify-content-end align-self-end mt-4">
+                                    <button class="btn btn-outline-success me-2"
+                                        [disabled]="!nuevaZona.nombre || !nuevaZona.centroGeografico.latitud || !nuevaZona.centroGeografico.longitud || nuevaZona.area.puntos.length < 3"
+                                        (click)="guardarNuevaZona()" *ngIf="!editarZona">
+                                        <!-- hacer que este boton envie a guardarNeuvaZona o actualizarZona, dependiendo de una variable booleana de edicion de Zona -->
+                                        <i class="bi bi-check-lg"></i> Aceptar
                                     </button>
-                                    <button class="btn btn-outline-danger" title="Eliminar">
-                                        <i class="bi bi-trash"></i>
+                                    <button class="btn btn-outline-success me-2"
+                                        [disabled]="!nuevaZona.nombre || !nuevaZona.centroGeografico.latitud || !nuevaZona.centroGeografico.longitud || nuevaZona.area.puntos.length < 3"
+                                        (click)="guardarZonaExistente()" *ngIf="editarZona">
+                                        <!-- hacer que este boton envie a guardarNeuvaZona o actualizarZona, dependiendo de una variable booleana de edicion de Zona -->
+                                        <i class="bi bi-check-lg"></i> Guardar
                                     </button>
-                                </span>-->
+                                    <button class="btn btn-outline-secondary" (click)="cancelarNuevaZona()"
+                                        id="cancelarAgregarZonaBtn" data-bs-target="#modalDetalle"
+                                        data-bs-toggle="modal">
+                                        <i class="bi bi-x-lg"></i> Cancelar
+                                    </button>
+                                </span>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal añadir barrio -->
+    <div class="modal fade" id="addBarrioModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-fullscreen-lg-down modal-xl">
+            <div class="modal-content">
+                <div class="card border-0 w-100">
+                    <div class="row g-0" style="min-height: 75vh;">
+                        <div class="col-md-6" style="min-height: 25vh;">
+                            <div class="img-fluid rounded-start bg-primary h-100 position-relative">
+                                <div class="spinner-border text-light position-absolute top-50 start-50 translate-middle"
+                                    role="status" *ngIf="modalMapNewBarrio === null">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <div id="modalMapNewBarrio" class="w-100 h-100"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card-body d-flex flex-column justify-content-between w-100 h-100 p-4">
+                                <div class="row g-3">
+                                    <span
+                                        class="col-12 card-title d-flex justify-content-between align-items-center py-2 ">
+                                        <!-- Nombre -->
+                                        <input type="text" [(ngModel)]="newBarrio.nombre" placeholder="Nombre"
+                                            class="my-auto form-control fs-4 me-4" />
+                                        <button type="button" class="btn-close" (click)="cancelar()" id="cancelarNuevoBarrio"
+                                            data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </span>
+
+                                    <div class="col-12 ">
+                                        <!-- Descripción -->
+                                        <textarea [(ngModel)]="newBarrio.descripcion" placeholder="Descripción" rows="3"
+                                            style="resize: none;" class="form-control">
+                                        </textarea>
+                                    </div>
+
+                                    <label class="col-sm-3 col-form-label" for="latitudnewBarrio">Latitud</label>
+                                    <div class="col-sm-9">
+                                        <!-- Latitud -->
+                                        <input id="latitudnewBarrio" type="number"
+                                            [(ngModel)]="newBarrio.centroGeografico.latitud" placeholder="Latitud"
+                                            class="form-control" />
+
+                                    </div>
+
+                                    <label class="col-sm-3 col-form-label" for="longitudnewBarrio">Longitud</label>
+                                    <div class="col-sm-9">
+                                        <!-- Longitud -->
+                                        <input id="longitudnewBarrio" type="number"
+                                            [(ngModel)]="newBarrio.centroGeografico.longitud" placeholder="Longitud"
+                                            class="form-control" />
+
+                                    </div>
+                                </div>
+
+                                <span class="d-flex justify-content-end align-self-end mt-4">
+                                    <ng-container>
+                                        <button class="btn btn-outline-primary me-2" (click)="addBarrio()">
+                                            <i class="bi bi-plus-lg me-2"></i> Añadir barrio
+                                        </button>
+                                        <button class="btn btn-outline-secondary" (click)="cancelar()"
+                                            data-bs-dismiss="modal">
+                                            <i class="bi bi-x-lg"></i> Cancelar
+                                        </button>
+                                    </ng-container>
+                                </span>
                             </div>
                         </div>
                     </div>

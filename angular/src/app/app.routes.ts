@@ -11,14 +11,14 @@ import { Welcome } from './pages/welcome/welcome';
 import { Usuarios } from './pages/usuarios/Usuarios';
 import { Map } from './pages/map/map';
 import { Barrios } from './pages/barrios/barrios';
-import { Zonas } from './pages/zonas/zonas';
+//import { Zonas } from './pages/zonas/zonas';  DEPRECATED
 import { Encuestadores } from './pages/encuestadores/encuestadores';
 import { Campanias } from './pages/campanias/campanias';
 import { Jornadas } from './pages/jornadas/jornadas';
 
 // Details
 import { UserDetail } from './pages/details/user-detail/user-detail';
-import { BarrioDetail } from './pages/details/barrio-detail/barrio-detail';
+//import { BarrioDetail } from './pages/details/barrio-detail/barrio-detail';  DEPRECATED
 import { JornadaDetail } from './pages/details/jornada-detail/jornada-detail';
 import { EncuestadorDetail } from './pages/details/encuestador-detail/encuestador-detail';
 
@@ -32,8 +32,8 @@ export const routes: Routes = [
     {path: 'user/:id', component: UserDetail, canActivate: [authGuard]},
     {path: 'map', component: Map, canActivate: [authGuard]},
     {path: 'barrios', component: Barrios, canActivate: [authGuard]},
-    {path: 'barrios/:id', component: BarrioDetail, canActivate: [authGuard]},
-    {path: 'zonas', component: Zonas, canActivate: [authGuard]},
+    //{path: 'barrios/:id', component: BarrioDetail, canActivate: [authGuard]},
+    //{path: 'zonas', component: Zonas, canActivate: [authGuard]}, DEPRECATED
     {path: 'encuestadores', component: Encuestadores, canActivate: [authGuard]},
     {path: 'encuestadores/:id', component: EncuestadorDetail, canActivate: [authGuard]},
     {path: 'campanias', component: Campanias, canActivate: [authGuard]},
