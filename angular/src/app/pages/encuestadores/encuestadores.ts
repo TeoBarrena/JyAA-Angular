@@ -7,6 +7,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 
+import { ToastService } from '../../layout/notificaciones/toast.service';
+
 // agregar token y headers para los http requests
 
 @Component({
@@ -47,7 +49,7 @@ export class Encuestadores {
   constructor(
     private http: HttpClient,
     private auth: AuthService,
-
+    private toastService: ToastService,
   ){}
 
   ngOnInit() {
@@ -65,7 +67,7 @@ export class Encuestadores {
       },
       error: (error) => {
         console.error('Error fetching encuestadores:', error);
-        alert('Error al obtener los encuestadores. Por favor, inténtelo de nuevo más tarde.');
+        this.toastService.show('error', 'Error al obtener los encuestadores. Por favor, inténtelo de nuevo más tarde.');
       }
     })
   }
@@ -78,7 +80,7 @@ export class Encuestadores {
       },
       error: (error) => {
         console.error('Error fetching jornadas:', error);
-        alert('Error al obtener las jornadas. Por favor, inténtelo de nuevo más tarde.');
+        this.toastService.show('error', 'Error al obtener las jornadas. Por favor, inténtelo de nuevo más tarde.');
       }
     })
   }
@@ -111,12 +113,12 @@ export class Encuestadores {
       console.log('Headers: ', headers);
       this.http.delete(`${environment.apiUrl}/encuestadores/deleteEncuestador/${id}`, { headers }).subscribe({
         next: () => {
-          alert('Encuestador eliminado correctamente.');
+          this.toastService.show('success', 'Encuestador eliminado correctamente.');
           this.getEncuestadores();
         },
         error: (error) => {
           console.error('Error al eliminar el encuestador:', error);
-          alert('Error al eliminar el encuestador. Por favor, inténtelo de nuevo más tarde.');
+          this.toastService.show('error', 'Error al eliminar el encuestador ' + error);
         }
       })
     }
@@ -145,7 +147,7 @@ export class Encuestadores {
 
     this.http.post<any>(`${environment.apiUrl}/encuestadores/nuevoEncuestador`, body, { headers }).subscribe({
       next: (data) => {
-        alert('Encuestador creado correctamente.');
+        this.toastService.show('success', 'Encuestador añadido correctamente.');
         this.reset();
         const modalElement = document.getElementById('addEncuestadorModal');
         if (modalElement) {
@@ -158,7 +160,7 @@ export class Encuestadores {
       },
       error: (error) => {
         console.error('Error al crear el encuestador:', error);
-        alert('Error al crear el encuestador. Por favor, inténtelo de nuevo más tarde.');
+        this.toastService.show('error', 'Error al añadir el encuestador ' + error);
       }
     });
   }

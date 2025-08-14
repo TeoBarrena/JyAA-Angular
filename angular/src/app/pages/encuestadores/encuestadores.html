@@ -24,7 +24,7 @@
     </span>
 
     <div class="table-responsive" *ngIf="encuestadores.length === 0">
-      <table class="table table-hover nomidborder-table ">
+      <table class="table table-hover nomidborder-table border-top-1">
         <tbody>
           <tr  *ngFor="let num of [].constructor(selectedPageSize); let i = index">
             <td>
@@ -57,7 +57,7 @@
     </div>
 
     <div class="table-responsive" *ngIf="paginatedEncuestadores && paginatedEncuestadores.length > 0">
-      <table class="table table-hover nomidborder-table " >
+      <table class="table table-hover nomidborder-table border-top" >
         <tbody>
           <tr *ngFor="let encuestador of paginatedEncuestadores">
             <td [routerLink]="['/encuestadores', encuestador.id]" [ngStyle]="{ cursor: 'pointer' }">{{ encuestador.nombre }}</td>

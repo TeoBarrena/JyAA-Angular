@@ -1,0 +1,23 @@
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0 !important;
+}
+
+.nomidborder-table th,
+.nomidborder-table td {
+  border-left: none;
+  border-right: none;
+  white-space: nowrap;
+}
+
+.nomidborder-table td:first-child,
+.nomidborder-table th:first-child {
+  border-left: 1px solid #dee2e6;
+}
+
+/* Add right border to the last cell */
+.nomidborder-table td:last-child,
+.nomidborder-table th:last-child {
+  border-right: 1px solid #dee2e6;
+}
