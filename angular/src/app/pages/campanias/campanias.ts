@@ -35,6 +35,18 @@ export class Campanias {
     barrioId: null
   }
 
+   // Filtros
+  nombreFilter: string = '';
+  barrioFilter: number | null = null;
+  fechaDesdeFilter: string = '';
+  fechaHastaFilter: string = '';
+
+   // Paginación
+  currentPage: number = 1;
+  selectedPageSize: number = 5;
+  filtered: any[] = [];
+  paginatedCampanias: any[] = [];
+
   constructor(
     private http: HttpClient,
     private auth: AuthService,
@@ -52,6 +64,7 @@ export class Campanias {
       next: (data) => {
         console.log('Campañas recibidas:', data);
         this.campanias = data;
+        this.updatePaginatedCampanias();
       },
       error: (error) => {
         alert(`Error al obtener las campañas: ${error}`);
@@ -185,5 +198,92 @@ export class Campanias {
     })
   }
 
+  getFilteredCampanias() {
+    return this.campanias.filter(campania => {
+      const fecha = new Date(campania.inicio);
 
+      // filtro por nombre
+      if (this.nombreFilter && !campania.nombre.toLowerCase().includes(this.nombreFilter.toLowerCase())) {
+        return false;
+      }
+
+      // filtro por barrio
+      if (this.barrioFilter && campania.barrio.id !== Number(this.barrioFilter)) {
+        return false;
+      }
+
+      // rango de fechas (igual que en jornadas.ts)
+      if (!this.fechaDesdeFilter && !this.fechaHastaFilter) {
+        return true;
+      }
+
+      if (this.fechaDesdeFilter && !this.fechaHastaFilter) {
+        return fecha >= new Date(this.fechaDesdeFilter);
+      }
+
+      if (!this.fechaDesdeFilter && this.fechaHastaFilter) {
+        return fecha <= new Date(this.fechaHastaFilter);
+      }
+
+      return (
+        fecha >= new Date(this.fechaDesdeFilter) &&
+        fecha <= new Date(this.fechaHastaFilter)
+      );
+    });
+  }
+
+  updatePaginatedCampanias() {
+    this.filtered = this.getFilteredCampanias();
+    const start = (this.currentPage - 1) * this.selectedPageSize;
+    const end = start + this.selectedPageSize;
+    this.paginatedCampanias = this.filtered.slice(start, end);
+  }
+
+  onFilterChange() {
+    this.currentPage = 1;
+    this.updatePaginatedCampanias();
+  }
+
+  changePageSize(size: number) {
+    this.selectedPageSize = Number(size);
+    this.currentPage = 1;
+    this.updatePaginatedCampanias();
+  }
+
+  prevPage() {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.updatePaginatedCampanias();
+    }
+  }
+
+  nextPage() {
+    if ((this.currentPage * this.selectedPageSize) < this.filtered.length) {
+      this.currentPage++;
+      this.updatePaginatedCampanias();
+    }
+  }
+
+  getTotalPages(): number {
+    return Math.ceil(this.filtered.length / this.selectedPageSize);
+  }
+
+  getPageNumbersToShow(): number[] {
+    const totalPages = this.getTotalPages();
+    const pages: number[] = [];
+
+    const start = Math.max(1, this.currentPage - 2);
+    const end = Math.min(totalPages, this.currentPage + 2);
+
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+    return pages;
+  }
+
+  goToPage(page: number) {
+    this.currentPage = page;
+    this.updatePaginatedCampanias();
+  }
+  
 }
