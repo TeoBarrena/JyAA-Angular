@@ -41,6 +41,17 @@ export class Jornadas {
   barrios: any[] = [];
   encuestadores: Encuestador[] = [];
 
+  //filtrado
+  fechaDesdeFilter = '';
+  fechaHastaFilter = '';
+
+  //Paginación
+  currentPage: number = 1;
+  selectedPageSize: number = parseInt(localStorage.getItem('pageSize') || '5', 10);
+
+  filtered: any[] = [];
+  paginatedJornadas: any[] = [];
+
   zonasBarrio: Zona[] = [];
 
   selectedEncuestadorId: number | null = null; // Para el select
@@ -82,6 +93,7 @@ export class Jornadas {
       next: (data) => {
         //console.log('Jornadas recibidas:', data);
         this.jornadas = data;
+        this.updatePaginatedJornadas();  
       },
       error: (error) => {
         console.error('Error al obtener las jornadas:', error);
@@ -367,4 +379,84 @@ getBarrioDeZonasEdit(): any | null {
   return null; // Si no encuentra ningún barrio con esas zonas
 }
 
+  updatePaginatedJornadas() {
+    this.filtered = this.getFilteredJornadas();
+    const start = (this.currentPage - 1) * this.selectedPageSize;
+    const end = start + this.selectedPageSize;
+    this.paginatedJornadas = this.filtered.slice(start, end);
+  }
+
+  getFilteredJornadas() {
+    return this.jornadas.filter(jornada =>{
+      const fecha = new Date(jornada.fecha);
+
+      if (!this.fechaDesdeFilter && !this.fechaHastaFilter){
+        return true;
+      }
+
+      if (this.fechaDesdeFilter && !this.fechaHastaFilter){
+        return fecha >= new Date(this.fechaDesdeFilter);
+      }
+
+      if (!this.fechaDesdeFilter && this.fechaHastaFilter){
+        return fecha <= new Date(this.fechaHastaFilter);
+      }
+
+      return (
+        fecha >= new Date(this.fechaDesdeFilter) &&
+        fecha <= new Date(this.fechaHastaFilter)
+      );
+
+    });
+  }
+
+  onFilterChange() {
+    this.currentPage = 1;
+    this.updatePaginatedJornadas();
+  }
+
+  changePageSize(size: number) {
+    this.selectedPageSize = Number(size);
+    localStorage.setItem('pageSize', size.toString());
+    this.currentPage = 1;
+    this.updatePaginatedJornadas();
+  }
+
+  prevPage() {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.updatePaginatedJornadas();
+    }
+  }
+
+  nextPage() {
+    if ((this.currentPage * this.selectedPageSize) < this.filtered.length){
+      this.currentPage++;
+      this.updatePaginatedJornadas();
+    }
+  }
+
+  getPageNumbersToShow(): number[] {
+    const totalPages = this.getTotalPages();
+    const pages: number[] = [];
+
+    const start = Math.max(1, this.currentPage - 2);
+    const end = Math.min(totalPages, this.currentPage + 2);
+
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+
+    return pages;
+  }
+
+  getTotalPages(): number {
+    return Math.ceil(this.filtered.length / this.selectedPageSize);
+  }  
+
+  goToPage(page: number): void {
+    this.currentPage = page;
+    this.updatePaginatedJornadas();
+  }
+  
 }

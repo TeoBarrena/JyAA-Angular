@@ -18,6 +18,10 @@
             <td>{{ encuestador.nombre }}</td>
           </tr>
           <tr>
+            <th scope="row">Fecha de nacimiento</th>
+            <td>{{ encuestador.nacimiento }}</td>
+          </tr>
+          <tr>
             <th scope="row">DNI</th>
             <td>{{ encuestador.dni }}</td>
           </tr>
@@ -29,6 +33,20 @@
             <th scope="row">Ocupación</th>
             <td>{{ encuestador.ocupacion }}</td>
           </tr>
+
+          <tr>
+            <th scope="row">Jornadas en las que participo</th>
+            <td>
+              <span *ngFor="let jornada of encuestador.jornadas">
+                <li class="list-styled">
+                  <a [routerLink]="['/jornada', jornada.id]" class="text-decoration-none">
+                    {{ jornada.fecha }}
+                  </a>
+                </li>
+              </span>
+            </td>
+          </tr>
+          
         </tbody>
       </table>
     </div>
@@ -38,7 +56,7 @@
       <div class="row w-100"> <!--Para que ocupe el 100% de ancho-->
 
         <div class="col-md-6 d-flex justify-content-end">
-          <button class="btn btn-outline-success d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#editEncuestadorModal">
+          <button class="btn btn-outline-success d-flex align-items-center" (click)="editEncuestador()">
             Editar
             <i class="bi bi-pencil ms-2"></i>
           </button>
@@ -53,5 +71,79 @@
 
         </div>
     </div>
-
 </div>
+
+<!-- Modal Editar Encuestador -->
+ <div class="modal fade" id="editEncuestadorModal" tabindex="-1" aria-labelledby="editEncuestadorModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+
+        <form (ngSubmit)="updateEncuestador()" #editEncuestadorForm="ngForm">
+          <div class="modal-header">
+            <h5 class="modal-title" id="editEncuestadorModalLabel">Editar Encuestador</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+
+          <div class="modal-body">
+          
+            <div class="mb-3">
+              <label for="nombre" class="form-label">Nombre</label>
+              <input type="text" class="form-control" id="nombre" [(ngModel)]="encuestadorEditado.nombre" name="nombre" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="dni" class="form-label">DNI</label>
+              <input type="number" class="form-control" id="dni" [(ngModel)]="encuestadorEditado.dni" name="dni" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="nacimiento" class="form-label">Fecha de nacimiento</label>
+              <input type="date" class="form-control" id="nacimiento" [(ngModel)]="encuestadorEditado.nacimiento" name="nacimiento" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="genero" class="form-label">Género</label>
+              <input type="text" class="form-control" id="genero" [(ngModel)]="encuestadorEditado.genero" name="genero" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="ocupacion" class="form-label">Ocupación</label>
+              <input type="text" class="form-control" id="ocupacion" [(ngModel)]="encuestadorEditado.ocupacion" name="ocupacion" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="jornadas" class="form-label">Jornadas en las que participó</label>
+              <div class="d-flex gap-2">
+                <select class="form-select" [(ngModel)]="selectedJornadaId" name="jornadaSelect">
+                  <option [ngValue]="null" disabled *ngIf="getAvailableJornadasEdit().length === 0">
+                    No hay jornadas disponibles
+                  </option>
+                  <option *ngFor="let jornada of getAvailableJornadasEdit()" [ngValue]="jornada.id">
+                    {{ jornada.fecha }}
+                  </option>
+                </select>
+                <button type="button" class="btn btn-success" (click)="addJornadaEdit(selectedJornadaId)" [disabled]="!selectedJornadaId">
+                  Agregar
+                </button>
+              </div>
+
+              <ul class="list-group mt-2">
+                <li *ngFor="let jornada of encuestadorEditado.jornadas" class="list-group-item d-flex justify-content-between align-items-center">
+                {{ jornada.fecha }}
+                <button type="button" class="btn btn-sm btn-danger" (click)="removeJornadaEdit(jornada.id)">Quitar</button>
+                </li>
+              </ul>
+            </div>
+
+          </div>
+
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-primary" (click)="updateEncuestador()" [disabled]="editEncuestadorForm.invalid">
+              Actualizar
+            </button>
+            <button type="button" class="btn btn-secondary" (click)="cancel()">Cancelar</button>
+          </div>
+        </form>
+        
+
+ </div>

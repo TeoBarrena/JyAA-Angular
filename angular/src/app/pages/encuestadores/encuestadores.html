@@ -1,48 +1,116 @@
 
 <app-navbar></app-navbar>
 
-<div class="container mt-4">
-    <h4 class="title mb-3">Encuestadores</h4>
-
-    <div class="row mb-3" *ngIf="rolUser === 'admin'">
-        <div class="col-md-4 offset-md-8 d-flex justify-content-end">
-            <button
-                class="btn btn-primary"
-                data-bs-toggle="modal"
-                data-bs-target="#addEncuestadorModal"
-            >
-                <i class="bi bi-plus"></i> Añadir encuestador
+<div class="container pt-5 mb-4">
+  <div class="row gy-3">
+    <span class="d-flex justify-content-between align-items-center">
+      <h5 class="fw-bold text-primary ">Encuestadores</h5>
+      <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addEncuestadorModal"><i
+          class="bi bi-plus"></i>Añadir encuestador</button>
+    </span>
+    <span class="d-flex justify-content-between align-items-center">
+      <div class="row flex-grow-1 gy-3">
+        <!--<form #(submit)="" class="col-12 col-lg-6 ">-->
+        <div class="col-12 col-lg-6">
+          <div class="input-group">
+            <input #searchInput type="text" class="form-control border-end-0" [(ngModel)]="dniFilter"
+              (ngModelChange)="onFilterChange()" placeholder="Filtrar por DNI">
+            <button class="input-group-text bg-white border-start-0" type="submit">
+              <i class="bi bi-search text-muted"></i>
             </button>
+          </div>
         </div>
-    </div>
-</div>
+       </div>
+    </span>
 
-
-<table class="table table-striped table-bordered table-hover table-sm">
-    <tbody>
-        <tr *ngFor="let encuestador of encuestadores">
-            <td class="align-middle text-center fw-semibold">{{ encuestador.nombre }}</td>
-
-            <td class="align middle text-center fw-semibold">{{ encuestador.dni }}</td>
-
-            <td class="align middle text-center fw-semibold">{{ encuestador.genero }}</td>
-
-            <td class="align middle text-center fw-semibold">{{ encuestador.ocupacion }}</td>
-
-            
-            <td *ngIf="rolUser === 'admin'"> 
-              <div class="mb-2 d-flex justify-content-around">
-                <button class="btn btn-outline-secondary" title="Ver" [routerLink]="['/encuestadores', encuestador.id]">
-                        <i class="bi bi-eye"></i>
-                </button>
-                <button class="btn btn-outline-danger" title="Eliminar" (click)="confirmDelete(encuestador.id)">
-                  <i class="bi bi-trash"></i>
-                </button>  
+    <div class="table-responsive" *ngIf="encuestadores.length === 0">
+      <table class="table table-hover nomidborder-table border-top-1">
+        <tbody>
+          <tr  *ngFor="let num of [].constructor(selectedPageSize); let i = index">
+            <td>
+              <div class="placeholder-glow mb-0">
+                <span class="placeholder w-100 h-100"></span>
               </div>
             </td>
-        </tr>
-    </tbody>
-</table>
+            <td  style="min-width:170px; width:170px;">
+              <div class="placeholder-glow mb-0">
+                <span class="placeholder w-100 h-100"></span>
+              </div>
+            </td>
+            <td style="min-width:300px; width:300px;">
+              <div class="placeholder-glow mb-0">
+                <span class="placeholder w-100 h-100"></span>
+              </div>
+            </td>
+            <td  style="min-width:200px; width:200px;">
+              <div class="placeholder-glow mb-0">
+                <span class="placeholder w-100 h-100"></span>
+              </div>
+            </td>
+            <td style="min-width:40px; width:40px;">
+              <div class="placeholder-glow mb-0">
+                <span class="placeholder w-100 h-100"></span>
+              </div>
+            </td>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="table-responsive" *ngIf="paginatedEncuestadores && paginatedEncuestadores.length > 0">
+      <table class="table table-hover nomidborder-table border-top" >
+        <tbody>
+          <tr *ngFor="let encuestador of paginatedEncuestadores">
+            <td [routerLink]="['/encuestadores', encuestador.id]" [ngStyle]="{ cursor: 'pointer' }">{{ encuestador.nombre }}</td>
+            <td [routerLink]="['/encuestadores', encuestador.id]" [ngStyle]="{ cursor: 'pointer' }">{{ encuestador.dni }}</td>
+            <td>{{ encuestador.genero }}</td>
+            <td>{{ encuestador.ocupacion }}</td>
+
+            <td class="p-0" style="min-width:40; width:40px;">
+              <button
+                class="w-100 p-2 border-0 rounded-0 h-100 btn btn-outline-danger d-flex justify-content-center align-items-center fw-bold"
+                (click)="confirmDelete(encuestador.id)">
+                <i class="bi bi-trash"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="align-self-end ps-3 mt-4" *ngIf="encuestadores.length > 0 && paginatedEncuestadores.length === 0">No hay encuestadores que coincidan con el filtro</p>
+
+    <!-- Paginación y cantidad de usuarios -->
+    <span class="mx-auto row gy-3 mt-0 d-flex justify-content-center align-items-center">
+      <div class="col-12 col-lg-4 mx-auto me-lg-auto ms-lg-0 p-lg-0">
+        <div class="mx-auto me-lg-auto ms-lg-0 d-flex justify-content-center align-items-center">
+          <label for="pageSize">Encuestadores por página:</label>
+          <input type="number" class="form-control form-control-sm ms-2" min="1" max="15" id="pageSize"
+            style="width:50px;" [(ngModel)]="selectedPageSize" (ngModelChange)="changePageSize($event)">
+          <!--<select class="form-select form-select-sm" id="pageSize" [(ngModel)]="selectedPageSize" (ngModelChange)="changePageSize($event)">
+                  <option *ngFor="let size of pageSizeOptions" [value]="size">{{size}}</option>
+                </select>-->
+
+        </div>
+      </div>
+      <nav class="col" *ngIf="paginatedEncuestadores && paginatedEncuestadores.length > 0">
+        <ul class="pagination my-auto  d-flex justify-content-center align-items-center">
+          <li class="page-item" [class.disabled]="currentPage === 1">
+            <button class="page-link" (click)="prevPage()">Anterior</button>
+          </li>
+
+          <li class="page-item" *ngFor="let page of getPageNumbersToShow()" [class.active]="page === currentPage">
+            <button class="page-link" (click)="goToPage(page)">{{ page }}</button>
+          </li>
+
+          <li class="page-item" [class.disabled]="currentPage === getTotalPages()">
+            <button class="page-link" (click)="nextPage()">Siguiente</button>
+          </li>
+
+        </ul>
+      </nav>
+    </span>
+  </div>
+</div>
 
 <!-- Modal añadir encuestador -->
 <div class="modal fade" id="addEncuestadorModal" tabindex="-1" aria-labelledby="addEncuestadorModalLabel" aria-hidden="true">
