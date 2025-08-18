@@ -50,13 +50,13 @@
     <div class="table-responsive" *ngIf="users.length === 0">
       <table class="table table-hover nomidborder-table ">
         <tbody>
-          <tr  *ngFor="let num of [].constructor(selectedPageSize); let i = index">
+          <tr *ngFor="let num of [].constructor(selectedPageSize); let i = index">
             <td>
-              <div class="placeholder-glow mb-0">
+              <div class="placeholder-glow mb-0" style="min-width:170px; width:170px;">
                 <span class="placeholder w-100 h-100"></span>
               </div>
             </td>
-            <td  style="min-width:170px; width:170px;">
+            <td style="min-width:130px; width:130px;">
               <div class="placeholder-glow mb-0">
                 <span class="placeholder w-100 h-100"></span>
               </div>
@@ -66,7 +66,12 @@
                 <span class="placeholder w-100 h-100"></span>
               </div>
             </td>
-            <td  style="min-width:200px; width:200px;">
+            <td style="min-width:200px; width:200px;">
+              <div class="placeholder-glow mb-0">
+                <span class="placeholder w-100 h-100"></span>
+              </div>
+            </td>
+            <td style="min-width:40px; width:40px;">
               <div class="placeholder-glow mb-0">
                 <span class="placeholder w-100 h-100"></span>
               </div>
@@ -81,12 +86,14 @@
     </div>
 
     <div class="table-responsive" *ngIf="paginatedUsers && paginatedUsers.length > 0">
-      <table class="table table-hover nomidborder-table " >
+      <table class="table table-hover nomidborder-table ">
         <tbody>
-          <tr *ngFor="let user of paginatedUsers">
-            <td (click)="viewUser(user.id)" [ngStyle]="{ cursor: 'pointer' }">{{ user.email }}</td>
-            <td (click)="viewUser(user.id)" [ngStyle]="{ cursor: 'pointer' }">{{ user.nombre }} {{ user.apellido }}</td>
-            <td>{{
+          <tr *ngFor="let user of paginatedUsers; let i = index;">
+            <td (click)="viewUser(i)" [ngStyle]="{ cursor: 'pointer' }" data-bs-toggle="modal"
+              data-bs-target="#addUserModal"style="min-width:170px;">{{ user.email }}</td>
+            <td (click)="viewUser(i)" [ngStyle]="{ cursor: 'pointer' }" data-bs-toggle="modal"
+              data-bs-target="#addUserModal" style="min-width:130px;">{{ user.nombre }} {{ user.apellido }}</td>
+            <td style="min-width:300px;">{{
               user.matricula && user.organizacion
               ? 'Personal de Salud / ' + user.organizacion.nombre
               : user.matricula
@@ -109,7 +116,14 @@
                 <option [value]="'PENDIENTE'">Pendiente</option>
               </select>
             </td>
-
+            <td class="p-0" style="min-width:40; width:40px;">
+              <button
+                class="w-100 p-2 border-0 rounded-0 h-100 btn btn-outline-primary d-flex justify-content-center align-items-center fw-bold"
+                (click)="editUser(i)" [ngStyle]="{ cursor: 'pointer' }" data-bs-toggle="modal"
+                data-bs-target="#addUserModal" *ngIf="user.id != currentUserId">
+                <i class="bi bi-pencil"></i>
+              </button>
+            </td>
             <td class="p-0" style="min-width:40; width:40px;">
               <button
                 class="w-100 p-2 border-0 rounded-0 h-100 btn btn-outline-danger d-flex justify-content-center align-items-center fw-bold"
@@ -122,7 +136,8 @@
       </table>
     </div>
 
-    <p class="align-self-end ps-3 mt-4" *ngIf="users.length > 0 && paginatedUsers.length === 0">No hay usuarios que coincidan con el filtro</p>
+    <p class="align-self-end ps-3 mt-4" *ngIf="users.length > 0 && paginatedUsers.length === 0">No hay usuarios que
+      coincidan con el filtro</p>
 
     <!-- Paginación y cantidad de usuarios -->
     <span class="mx-auto row gy-3 mt-0 d-flex justify-content-center align-items-center">
@@ -131,10 +146,6 @@
           <label for="pageSize">Usuarios por página:</label>
           <input type="number" class="form-control form-control-sm ms-2" min="1" max="15" id="pageSize"
             style="width:50px;" [(ngModel)]="selectedPageSize" (ngModelChange)="changePageSize($event)">
-          <!--<select class="form-select form-select-sm" id="pageSize" [(ngModel)]="selectedPageSize" (ngModelChange)="changePageSize($event)">
-                  <option *ngFor="let size of pageSizeOptions" [value]="size">{{size}}</option>
-                </select>-->
-
         </div>
       </div>
       <nav class="col" *ngIf="paginatedUsers && paginatedUsers.length > 0">
@@ -162,7 +173,11 @@
     <div class="modal-content">
 
       <div class="modal-header">
-        <h5 class="modal-title" id="addUserModalLabel">Añadir nuevo usuario</h5>
+        <h5 class="modal-title" id="addUserModalLabel" *ngIf="!editMode && !viewMode">Añadir nuevo usuario</h5>
+        <h5 class="modal-title" id="addUserModalLabel" *ngIf="editMode && !viewMode">Editar usuario {{ newUser.nombre }}
+          {{
+          newUser.apellido }}</h5>
+        <h5 class="modal-title" id="addUserModalLabel" *ngIf="!editMode && viewMode">Detalle del usuario</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar" id="closeModalBtn"
           (click)="resetForm()"></button>
       </div>
@@ -173,7 +188,8 @@
             <div class="row">
               <label for="nombre" class="col-12 col-form-label">Nombre</label>
               <div class="col-12">
-                <input type="text" class="form-control" id="nombre" [(ngModel)]="newUser.nombre" name="nombre">
+                <input type="text" id="nombre" [(ngModel)]="newUser.nombre" name="nombre"
+                  [class.form-control-plaintext]="viewMode" [class.form-control]="!viewMode" [readonly]="viewMode">
               </div>
             </div>
           </div>
@@ -182,7 +198,7 @@
             <div class="row">
               <label for="apellido" class="col-12 col-form-label">Apellido</label>
               <div class="col-12 ">
-                <input type="text" class="form-control" id="apellido" [(ngModel)]="newUser.apellido" name="apellido">
+                <input type="text" id="apellido" [(ngModel)]="newUser.apellido" name="apellido" [class.form-control-plaintext]="viewMode" [class.form-control]="!viewMode" [readonly]="viewMode">
               </div>
             </div>
           </div>
@@ -191,13 +207,13 @@
           <div class="col-12">
             <div class="row">
               <label for="email" class="col-md-2 col-form-label">Email</label>
-              <div class="col-12 col-md-10"> <input type="email" class="form-control" id="email"
-                  [(ngModel)]="newUser.email" name="email">
+              <div class="col-12 col-md-10"> <input type="email" id="email"
+                  [(ngModel)]="newUser.email" name="email"  [class.form-control-plaintext]="viewMode" [class.form-control]="!viewMode" [readonly]="viewMode">
               </div>
             </div>
           </div>
 
-          <div class="col-12">
+          <div class="col-12" *ngIf="!editMode && !viewMode">
             <div class="row">
               <label for="password" class="col-12 col-md-4 col-form-label">Contraseña</label>
               <div class="col-12 col-md-8">
@@ -211,7 +227,7 @@
           <div class="col-12">
             <div class="form-check">
               <input type="checkbox" class="form-check-input" [(ngModel)]="newUser.admin" name="admin"
-                (change)="onAdminChange()" />
+                (change)="onAdminChange()" [disabled]="viewMode" />
               <label class="form-check-label">Administrador</label>
             </div>
           </div>
@@ -220,13 +236,13 @@
           <div class="col-12">
             <div class=" form-check">
               <input type="checkbox" class="form-check-input" [(ngModel)]="newUser.personalSalud" name="personalSalud"
-                [disabled]="newUser.admin" (change)="onPersonalSaludChange()" />
+                [disabled]="newUser.admin" (change)="onPersonalSaludChange()" [disabled]="viewMode" />
               <label class="form-check-label">Personal de Salud</label>
             </div>
 
             <div *ngIf="newUser.personalSalud" class="mt-2">
               <input type="number" placeholder="Número de matrícula" [(ngModel)]="newUser.matricula" name="matricula"
-                class="form-control" />
+                [class.form-control-plaintext]="viewMode" [class.form-control]="!viewMode" [readonly]="viewMode" />
             </div>
 
           </div>
@@ -235,13 +251,14 @@
           <div class="col-12">
             <div class=" form-check">
               <input type="checkbox" class="form-check-input" [(ngModel)]="newUser.miembroOrg" name="miembroOrg"
-                [disabled]="newUser.admin" (change)="onMiembroOrgChange()" />
+                [disabled]="newUser.admin" (change)="onMiembroOrgChange()"[disabled]="viewMode" />
               <label class="form-check-label">Miembro de una organización</label>
             </div>
+            <select *ngIf="newUser.miembroOrg" [(ngModel)]="newUser.organizacion" [compareWith]="compareById"
+              name="organizacion" class="form-select mt-2" [disabled]="viewMode">
 
-            <select *ngIf="newUser.miembroOrg" [(ngModel)]="newUser.organizacion" name="organizacion"
-              class="form-select mt-2">
-              <option disabled selected value="">Organización social</option>
+              <option [ngValue]="null" disabled>Organización social</option>
+
               <option *ngFor="let org of organizaciones" [ngValue]="org">
                 {{ org.nombre }}
               </option>
@@ -251,12 +268,23 @@
       </div>
 
       <div class="modal-footer">
-        <button type="button" class="btn btn-primary" (click)="guardarNuevoUsuario()"
-          [disabled]="!formularioValido">Guardar</button>
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="resetForm()">Cancelar</button>
+        <!-- Modo vista -->
+        <button type="button" class="btn btn-outline-primary" (click)="editUser(null)" *ngIf="!editMode && viewMode"><i
+            class="bi bi-pencil"></i> Editar</button>
 
+        <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal" (click)="confirmDelete(newUser.id)"
+          *ngIf="!editMode && viewMode"><i class="bi bi-trash"></i> Eliminar</button>
+
+        <!-- modo edicion / agregar -->
+        <button type="button" class="btn btn-primary" (click)="guardarNuevoUsuario()" [disabled]="!formularioValido"
+          *ngIf="!editMode && !viewMode">Guardar</button>
+
+        <button type="button" class="btn btn-primary" (click)="guardarUsuario()" [disabled]="!formularioValido"
+          *ngIf="editMode && !viewMode">Guardar cambios</button>
+
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="resetForm()"
+          *ngIf="!viewMode">Cancelar</button>
       </div>
-
     </div>
   </div>
 </div>
