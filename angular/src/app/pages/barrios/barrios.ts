@@ -233,14 +233,13 @@ export class Barrios {
     )
       .pipe(
         tap(() => {
-          this.toastService.show('success-outline', 'Barrio actualizado correctamente');
-          this.editMode = false;
+          //this.toastService.show('success-outline', 'Barrio actualizado correctamente');
+          //this.editMode = false;
         }),
-        switchMap(() => this.getBarrios()) // wait for barrios to be fetched
+        switchMap(() => this.getBarrios()) 
       )
       .subscribe({
         next: () => {
-
           this.toastService.show('success-outline', 'Barrio actualizado correctamente');
           this.editMode = false;
           setTimeout(() => {
@@ -571,11 +570,12 @@ export class Barrios {
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
     const body = {
       ...this.nuevaZona,
+      id: this.editarZonaId,
       barrio: { id: this.selectedBarrio.id }
     };
     this.http.put<any>(`${environment.apiUrl}/zonas/${this.editarZonaId}`, body, { headers })
       .pipe(
-        switchMap(() => this.getBarrios()) // wait until barrios are refreshed
+        switchMap(() => this.getBarrios())
       )
       .subscribe({
         next: () => {
