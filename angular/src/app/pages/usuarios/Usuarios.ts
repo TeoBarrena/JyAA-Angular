@@ -266,8 +266,9 @@ export class Usuarios {
           this.toastService.show('success', 'Usuario eliminado exitosamente');
         }, 100);
       },
-      error: (mensaje) => {
-        this.toastService.show('error', 'Error al eliminar el usuario ' + mensaje);
+      error: (error) => {
+        console.error('Error al eliminar el usuario:',error);
+        this.toastService.show('error', 'Error al eliminar el usuario ' + error.message, 8000);
       }
     });
   }
@@ -375,7 +376,7 @@ export class Usuarios {
     this.viewMode = false;
     this.editMode = true;
     if(i != null){
-      this.newUser = JSON.parse(JSON.stringify(this.users[i]));
+      this.newUser = JSON.parse(JSON.stringify(this.paginatedUsers[i]));
       this.newUser = {
         ...this.newUser,
         miembroOrg: this.newUser.organizacion != null,
@@ -389,7 +390,7 @@ export class Usuarios {
   viewUser(i: number) {
     this.viewMode = true;
     this.editMode = false;
-    this.newUser = JSON.parse(JSON.stringify(this.users[i]));
+    this.newUser = JSON.parse(JSON.stringify(this.paginatedUsers[i]));
     this.newUser = {
       ...this.newUser,
       miembroOrg: this.newUser.organizacion != null,

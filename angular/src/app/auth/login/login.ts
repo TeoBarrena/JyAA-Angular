@@ -50,7 +50,7 @@ export class Login {
         console.log('Token recibido:', response.token);
         this.AuthService.login(); //registra el inicio de sesión en el servicio de autenticación
         if (response.admin === true) {
-          this.AuthService.setUserRole('admin'); //si bien en la BD se registra como 'Admin' lo dejo como 'admin' porque en los html quedo asi
+          this.AuthService.setUserRole('Admin');
         }else{
           this.AuthService.setUserRole(response.roles);
         }

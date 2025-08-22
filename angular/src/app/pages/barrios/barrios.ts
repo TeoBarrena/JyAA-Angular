@@ -236,7 +236,7 @@ export class Barrios {
           //this.toastService.show('success-outline', 'Barrio actualizado correctamente');
           //this.editMode = false;
         }),
-        switchMap(() => this.getBarrios()) 
+        switchMap(() => this.getBarrios())
       )
       .subscribe({
         next: () => {
@@ -295,8 +295,14 @@ export class Barrios {
           attributionControl: false,
           minZoom: 11,
           maxZoom: 14,
-          zoom: 14,
-          zoomControl: false,  // Oculta los botones + y -
+          zoom: 14, 
+          dragging: false,     
+          scrollWheelZoom: false,  
+          doubleClickZoom: false, 
+          boxZoom: false,  
+          keyboard: false, 
+          touchZoom: false,
+          zoomControl: false, 
         }).setView([lat, lng], 16);
 
         L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
@@ -346,6 +352,7 @@ export class Barrios {
   deleteBarrio(id: number) {
     const token = localStorage.getItem('token'); //agrtego esta lógica para manejar que solanmente los admin puedan eliminar barrios
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`); //dps en el back el BarrioResource recibe y desglosa la http request y se fija que tenga el rol de Admin el que ejecuta la peticion 
+    console.log("Token en deleteBarrio:", token);
 
     this.http.delete<any>(`${environment.apiUrl}/barrios/deleteBarrio/${id}`, { headers }).subscribe({
       next: () => {
@@ -364,7 +371,7 @@ export class Barrios {
         console.error('Error al eliminar el barrio:', error);
         //alert('Error al eliminar el barrio');
 
-        this.toastService.show("error", "Error al eliminar el barrio");
+        this.toastService.show("error", "Error al eliminar el barrio, " + error.message, 8000);
       }
     })
   }
@@ -382,7 +389,7 @@ export class Barrios {
   }
 
   deleteZona(id: number) {
-    const token = localStorage.getItem('token'); // Controlar que solo admins puedan eliminar
+    const token = localStorage.getItem('token');
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
 
     this.http.delete<any>(`${environment.apiUrl}/zonas/${id}`, { headers }).subscribe({
@@ -396,7 +403,7 @@ export class Barrios {
       },
       error: (error) => {
         console.error('Error al eliminar la zona:', error);
-        this.toastService.show("error", "Error al eliminar la zona");
+        this.toastService.show("error", "Error al eliminar la zona, " + error.message, 8000);
       }
     })
   }

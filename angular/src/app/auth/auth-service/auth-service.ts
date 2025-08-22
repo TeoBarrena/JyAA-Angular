@@ -19,11 +19,12 @@ export class AuthService {
   }
 
   logout(){
-    localStorage.removeItem('isLoggedIn'); //elimina el estado de inicio de sesión en localStorage
-    localStorage.removeItem('userRole'); //elimina el rol del usuario
+    localStorage.removeItem('isLoggedIn'); 
+    localStorage.removeItem('userRole'); 
     localStorage.removeItem('userId');
+    localStorage.removeItem('pageSize');
     this.clearToken();
-    this.loggedIn.next(false); //cambia el estado a cierre sesión
+    this.loggedIn.next(false); 
   }
 
   isLoggedIn(): boolean {
