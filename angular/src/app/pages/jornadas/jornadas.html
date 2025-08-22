@@ -68,7 +68,7 @@
                             <th class="text-center">Fecha</th>
                             <th class="text-center">Zonas</th>
                             <th class="text-center">Encuestadores</th>
-                            <th *ngIf="rolUser === 'admin'" class="text-center">Acciones</th>
+                            <th *ngIf="rolUser?.includes('Admin')" class="text-center">Acciones</th>
                         </tr>
                     </thead>
         <tbody>
@@ -99,7 +99,7 @@
                                 </div>
                             </td>
 
-                            <td class="align-middle text-center" *ngIf="rolUser === 'admin'">
+                            <td class="align-middle text-center" *ngIf="rolUser?.includes('Admin')">
                                 <div class="d-flex justify-content-center gap-2">
                                     <button class="btn btn-outline-primary" title="Editar"
                                         (click)="editJornada(jornada)">

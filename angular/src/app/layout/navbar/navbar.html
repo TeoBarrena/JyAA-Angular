@@ -17,7 +17,7 @@
     </button>
 
     <!-- Sección colapsable -->
-    <div class="collapse navbar-collapse" id="navbarNav" *ngIf="auth.isLoggedIn()">
+    <div class="collapse navbar-collapse" id="navbarNav" *ngIf="auth.isLoggedIn | async">
 
       <!-- Menú centrado -->
       <ul class="navbar-nav mx-auto align-items-center">
@@ -79,9 +79,10 @@
       </div>
     </div>
 
-    <div *ngIf="showLoginButton()" class="ms-auto nav-item">
-      <a routerLink="/login" class="nav-link ">Iniciar sesión</a>
-    </div>
+    <div *ngIf="!(auth.isLoggedIn | async ) && checkUrl()" class="ms-auto d-flex gap-2">
+    <a routerLink="/login" class="btn btn-sm btn-outline-primary text-white">Iniciar sesión</a>
+    <a routerLink="/register" class="btn btn-sm btn-outline-primary">Registrarse</a>
+  </div>
 
   </div>
 </nav>

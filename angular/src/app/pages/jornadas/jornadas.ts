@@ -35,7 +35,7 @@ interface JornadaEditada {
 export class Jornadas {
 
   jornadas: any[] = [];
-  rolUser: string | null = null;
+  rolUser: string[] = [];
   campanias: any[] = [];
   zonas: any[] = [];
   barrios: any[] = [];
@@ -81,7 +81,9 @@ export class Jornadas {
   ){}
 
   ngOnInit() {
-    this.rolUser = this.auth.getUserRole();
+    this.auth.getUserRole().subscribe(roles => {
+      this.rolUser = roles;
+    });
     this.getJornadas();
     this.getCampanias();
     this.getBarrios();
@@ -216,7 +218,6 @@ export class Jornadas {
  }
 
  crearJornada() {
-  const headers = this.auth.getHeaderHttp();
   const body = {
     fecha: this.nuevaJornada.fecha,
     campaña: this.nuevaJornada.campania,
@@ -224,7 +225,7 @@ export class Jornadas {
     encuestadores: this.nuevaJornada.encuestadores,
   }
   console.log('Cuerpo de la solicitud:', body);
-  this.http.post(`${environment.apiUrl}/jornadas/nuevaJornada`, body, { headers }).subscribe({
+  this.http.post(`${environment.apiUrl}/jornadas/nuevaJornada`, body, { withCredentials: true }).subscribe({
     next: (data) => {
       alert('Jornada creada correctamente');
       this.getJornadas();
@@ -267,8 +268,7 @@ export class Jornadas {
       zonas: this.jornadaEditada.zonas,
       encuestadores: this.jornadaEditada.encuestadores,
     }
-    const headers = this.auth.getHeaderHttp();
-    this.http.put(`${environment.apiUrl}/jornadas/editJornada/${this.jornadaEditada.id}`, body, { headers }).subscribe({
+    this.http.put(`${environment.apiUrl}/jornadas/editJornada/${this.jornadaEditada.id}`, body, { withCredentials: true }).subscribe({
       next: () => {
         alert('Jornada actualizada correctamente');
         this.getJornadas();
@@ -289,8 +289,7 @@ export class Jornadas {
   }
 
   deleteJornada(jornadaId: number) {
-    const headers = this.auth.getHeaderHttp();
-    this.http.delete(`${environment.apiUrl}/jornadas/deleteJornada/${jornadaId}`, { headers }).subscribe({
+    this.http.delete(`${environment.apiUrl}/jornadas/deleteJornada/${jornadaId}`, { withCredentials: true }).subscribe({
       next: () => {
         alert('Jornada eliminada correctamente');
         this.getJornadas();

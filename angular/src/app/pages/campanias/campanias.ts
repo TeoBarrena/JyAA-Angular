@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Navbar } from "../../layout/navbar/navbar";
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment.development';
 import { AuthService } from '../../auth/auth-service/auth-service';
 import { FormsModule } from '@angular/forms';
@@ -18,7 +18,7 @@ export class Campanias {
   campanias: any[] = [];
   barrios: any[] = [];
 
-  rolUser: string | null = null;
+  rolUser: string[] = [];
 
   nuevaCampania = {
     nombre: '',
@@ -55,7 +55,9 @@ export class Campanias {
 
   ngOnInit(){
     this.getCampanias();
-    this.rolUser = this.auth.getUserRole();
+    this.auth.getUserRole().subscribe(roles => {
+      this.rolUser = roles;
+    });
   }
 
 
@@ -97,9 +99,7 @@ export class Campanias {
       }
     };
 
-    const headers = this.auth.getHeaderHttp();
-
-      this.http.post<any>(`${environment.apiUrl}/campanias/nuevaCampania`, body, { headers }).subscribe({
+      this.http.post<any>(`${environment.apiUrl}/campanias/nuevaCampania`, body, { withCredentials:true }).subscribe({
         next: (data) => {
           console.log('Campaña creada:', body);
           alert('Campaña creada correctamente');
@@ -158,9 +158,7 @@ export class Campanias {
       }
     };
 
-    const headers = this.auth.getHeaderHttp();
-
-    this.http.put<any>(`${environment.apiUrl}/campanias/editCampania/${this.campaniaEditada.id}`, body, { headers }).subscribe({
+    this.http.put<any>(`${environment.apiUrl}/campanias/editCampania/${this.campaniaEditada.id}`, body, { withCredentials:true }).subscribe({
       next: (data) => {
         console.log('Campaña actualizada:', body);
         alert('Campaña actualizada correctamente');
@@ -185,8 +183,8 @@ export class Campanias {
 
   deleteCampania(campaniaId: number) {
     console.log('Eliminando campaña con ID:', campaniaId);
-    const headers = this.auth.getHeaderHttp();
-    this.http.delete(`${environment.apiUrl}/campanias/deleteCampania/${campaniaId}`, { headers }).subscribe({
+    
+    this.http.delete(`${environment.apiUrl}/campanias/deleteCampania/${campaniaId}`, { withCredentials:true }).subscribe({
       next: () => {
         alert('Campaña eliminada correctamente');
         this.getCampanias();

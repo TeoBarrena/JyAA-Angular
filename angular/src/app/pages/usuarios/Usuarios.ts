@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Navbar } from "../../layout/navbar/navbar";
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../auth/auth-service/auth-service';
 import { FormsModule } from '@angular/forms';
@@ -25,7 +25,7 @@ export class Usuarios {
   organizaciones: any[] = [];
 
   //Para almacenar el rol del usuario autenticado
-  userRole: string | null = null;
+  userRole: string[] = [];
 
   //Paginación
   //pageSizeOptions: number[] = [2, 5, 10];
@@ -37,7 +37,7 @@ export class Usuarios {
   tipoFilter: string = '';
   organizacionFilter: string = '';
   filtered: any[] = [];
-  currentUserId: number = 0;
+  currentUserId: number | null = null;
   currentUserRole: string | null = null;
 
   newUser: any = {
@@ -62,9 +62,10 @@ export class Usuarios {
   ngOnInit() {
     this.getOrganizaciones();
     this.getUsers();
-    this.userRole = this.auth.getUserRole();
-    this.currentUserId = Number(localStorage.getItem('userId'));
-    this.currentUserRole = localStorage.getItem('userRole');
+    this.currentUserId = this.auth.getUserId();
+    this.auth.getUserRole().subscribe(roles => {
+      this.userRole = roles;
+    })
   }
 
   getUsers() {
@@ -181,14 +182,8 @@ export class Usuarios {
       }
     }
 
-    const token = localStorage.getItem('token');
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-    //console.log('Token:', token);
-    //console.log(body);
 
-    //console.log('Rol: ' + localStorage.getItem('userRole'));
-
-    this.http.post(`${environment.apiUrl}/usuarios/nuevoUser`, body, { headers }).subscribe({
+    this.http.post(`${environment.apiUrl}/usuarios/nuevoUser`, body, { withCredentials: true }).subscribe({
       next: () => {
         //alert('Usuario registrado exitosamente');
         this.toastService.show('success', 'Usuario registrado exitosamente');
@@ -257,10 +252,8 @@ export class Usuarios {
   }
 
   public deleteUser(userId: number): void {
-    const token = localStorage.getItem('token'); //se necesita el token para en el back verificar que el usuario es admin 
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`); //setea el header de autorización con el token
 
-    this.http.delete(`${environment.apiUrl}/usuarios/deleteUser/${userId}`, { headers }).subscribe({
+    this.http.delete(`${environment.apiUrl}/usuarios/deleteUser/${userId}`, { withCredentials: true }).subscribe({
       next: () => {
         //alert('Usuario eliminado exitosamente');
         this.toastService.show('success', 'Usuario eliminado exitosamente');
@@ -293,10 +286,8 @@ export class Usuarios {
 
 
   public cambiarEstado(userId: number, estado: string): void {
-    const token = localStorage.getItem('token'); //se necesita el token para en el back verificar que el usuario es admin 
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`); //setea el header de autorización con el token
 
-    this.http.patch(`${environment.apiUrl}/usuarios/${userId}/${estado}`, null, { headers }).subscribe({
+    this.http.patch(`${environment.apiUrl}/usuarios/${userId}/${estado}`, null, { withCredentials: true }).subscribe({
       next: () => {
         this.toastService.show('success-outline', 'Estado del usuario modificado', 2000);
         this.getUsers();

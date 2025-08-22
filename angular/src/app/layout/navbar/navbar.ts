@@ -19,13 +19,9 @@ export class Navbar {
 
   logout() {
     this.auth.logout();
-    this.router.navigate(['/login']); 
   }
 
-  showLoginButton(): boolean {
-    return (
-      !this.auth.isLoggedIn() &&
-      this.router.url !== '/login'
-    );
+  checkUrl(): boolean {
+    return this.router.url !== '/login'
   }
 }

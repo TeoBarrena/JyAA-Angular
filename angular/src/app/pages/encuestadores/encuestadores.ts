@@ -9,7 +9,6 @@ import { RouterLink } from '@angular/router';
 
 import { ToastService } from '../../layout/notificaciones/toast.service';
 
-// agregar token y headers para los http requests
 
 @Component({
   selector: 'app-encuestadores',
@@ -25,7 +24,7 @@ export class Encuestadores {
   paginatedEncuestadores: any[] = [];
 
   //rol del usuario para mostrar u ocultar botones
-  rolUser: string | null = null;
+  rolUser: string[] = [];
 
   selectedJornadaId: number | null = null; //esto para el select de jornadas, y no ingresar repetidas
 
@@ -53,7 +52,9 @@ export class Encuestadores {
   ){}
 
   ngOnInit() {
-    this.rolUser = this.auth.getUserRole();
+    this.auth.getUserRole().subscribe(roles => {
+      this.rolUser = roles;
+    });
     this.getEncuestadores();
   }
 
@@ -109,9 +110,7 @@ export class Encuestadores {
   confirmDelete(id: number) {
     if (confirm('¿Estás seguro de que deseas eliminar este encuestador?')){
       console.log('ID: ', id);
-      const headers = this.auth.getHeaderHttp();
-      console.log('Headers: ', headers);
-      this.http.delete(`${environment.apiUrl}/encuestadores/deleteEncuestador/${id}`, { headers }).subscribe({
+      this.http.delete(`${environment.apiUrl}/encuestadores/deleteEncuestador/${id}`, { withCredentials: true }).subscribe({
         next: () => {
           this.toastService.show('success', 'Encuestador eliminado correctamente.');
           this.getEncuestadores();
@@ -136,7 +135,6 @@ export class Encuestadores {
   }
 
   addEncuestador() {
-    const headers = this.auth.getHeaderHttp();
     const body = {
       nombre: this.newEncuestador.nombre,
       dni: this.newEncuestador.dni,
@@ -145,7 +143,7 @@ export class Encuestadores {
       jornadas: this.newEncuestador.jornadas
     }
 
-    this.http.post<any>(`${environment.apiUrl}/encuestadores/nuevoEncuestador`, body, { headers }).subscribe({
+    this.http.post<any>(`${environment.apiUrl}/encuestadores/nuevoEncuestador`, body, { withCredentials: true }).subscribe({
       next: (data) => {
         this.toastService.show('success', 'Encuestador añadido correctamente.');
         this.reset();

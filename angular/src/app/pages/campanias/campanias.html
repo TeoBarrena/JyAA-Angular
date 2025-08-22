@@ -4,7 +4,7 @@
   <div class="row gy-3">
     <span class="d-flex justify-content-between align-items-center">
       <h5 class="fw-bold text-primary">Campañas</h5>
-      <button class="btn btn-primary" *ngIf="rolUser === 'admin'"
+      <button class="btn btn-primary" *ngIf="rolUser?.includes('Admin')"
               data-bs-toggle="modal" data-bs-target="#addCampaniaModal">
         <i class="bi bi-plus"></i> Añadir campaña
       </button>
@@ -100,7 +100,7 @@
             <th class="text-center">Fecha Inicio / Fin</th>
             <th class="text-center">Barrio</th>
             <th class="text-center">Jornadas</th>
-            <th *ngIf="rolUser === 'admin'" class="text-center">Acciones</th>
+            <th *ngIf="rolUser?.includes('Admin')" class="text-center">Acciones</th>
           </tr>
         </thead>
         <tbody>
@@ -118,7 +118,7 @@
                 <a [routerLink]="['/jornada', jornada.id]">{{ jornada.fecha }}</a>
               </div>
             </td>
-            <td class="align-middle text-center" *ngIf="rolUser === 'admin'">
+            <td class="align-middle text-center" *ngIf="rolUser?.includes('Admin')">
               <div class="d-flex justify-content-center gap-2">
                 <button class="btn btn-outline-primary" (click)="editCampania(campania)">
                   <i class="bi bi-pencil"></i>

@@ -1,60 +1,86 @@
-import { HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable, of } from 'rxjs';
+import { environment } from '../../../environments/environment.development';
+import { Router } from '@angular/router';
+import { ToastService } from '../../layout/notificaciones/toast.service';
+import { map, catchError, tap } from 'rxjs/operators';
 
 //Funciona como un servicio no como componente
 @Injectable({providedIn: 'root'}) //permite inyeccion global del servicio
 export class AuthService {
-  private loggedIn = new BehaviorSubject<boolean>(this.hasSession()); //observable para el estado de autenticación
-  isLoggedIn$ = this.loggedIn.asObservable(); //observable para que otros componentes puedan suscribirse
 
-  private hasSession(): boolean {
-    return localStorage.getItem('isLoggedIn') === 'true'; //verifica si hay una sesión activa
-  }
+  constructor(
+    private http: HttpClient,
+    private router: Router,
+    private toastService: ToastService
+  ){}
 
-  login(){
-    localStorage.setItem('isLoggedIn', 'true'); //guarda el estado de inicio de sesión en localStorage
+  private loggedIn$ = new BehaviorSubject<boolean>(false);
+  private userRole$ = new BehaviorSubject<string[]>([]);
+  private userId$ = new BehaviorSubject<number | null>(null);
+
+  public isLoggedIn: Observable<boolean> = this.loggedIn$.asObservable();
+  public userRoles: Observable<string[]> = this.userRole$.asObservable();
+  public userId: Observable<number | null> = this.userId$.asObservable();
+
+  login(roles: string[], userId: number){
     localStorage.setItem('pageSize', '5'); //guarda el default de cantidad de elementos por pagina
-    this.loggedIn.next(true); //cambia el estado a inicio sesión
+    this.loggedIn$.next(true);
+    this.setUserRole(roles);
+    this.setUserId(userId);
+  } 
+
+  setUserId(id: number | null){
+    this.userId$.next(id);
   }
 
-  logout(){
-    localStorage.removeItem('isLoggedIn'); //elimina el estado de inicio de sesión en localStorage
-    localStorage.removeItem('userRole'); //elimina el rol del usuario
-    localStorage.removeItem('userId');
-    this.clearToken();
-    this.loggedIn.next(false); //cambia el estado a cierre sesión
+  getUserId(): number | null {
+    return this.userId$.value;
   }
 
-  isLoggedIn(): boolean {
-    return this.loggedIn.value; //devuelve el estado actual de autenticación
-  }
+  checkSession(): Observable<boolean> {
+  return this.http.get<any>(`${environment.apiUrl}/auth/check-session`, { withCredentials: true }).pipe(
 
-  //Manejo de token para JWT
-  setToken(token:string): void {
-    localStorage.setItem('token', token);
-  }
+    tap(response => {
+      this.login(response.roles, response.id);
+    }),
 
-  getToken(): string | null {
-    return localStorage.getItem('token');
-  }
+    map(() => true),
 
-  clearToken(): void {
-    return localStorage.removeItem('token');
+    catchError(() => {
+      console.log('No active session found');
+      this.loggedIn$.next(false);
+      this.userRole$.next([]); 
+      this.userId$.next(null);   
+      return of(false);
+    })
+  );
+}
+
+  logout() {
+    this.loggedIn$.next(false);
+    this.setUserRole([]);
+    this.setUserId(null);
+    this.router.navigate(['/login']);
+    
+    this.http.post<any>(`${environment.apiUrl}/auth/logout`, {}, { withCredentials:true }).subscribe({
+      next: () => {
+        this.toastService.show('success', 'Sesión cerrada con éxito');
+      },
+      error: () => {
+        this.toastService.show('error', 'Error al cerrar sesión');
+      }
+    });
   }
 
   //Manejo de roles 
-  setUserRole(role: string) {
-    localStorage.setItem('userRole', role);
-  }
+  setUserRole(roles: string[]) {
+    this.userRole$.next(roles);
+  }  
 
-  getUserRole(): string | null {
-    return localStorage.getItem('userRole'); //devuelve el rol del usuario almacenado en localStorage
-  }
-
-  getHeaderHttp(): HttpHeaders {
-    const token = this.getToken();
-    return new HttpHeaders().set('Authorization', `Bearer ${token}`); //configura el header HTTP con el token JWT
-  }
+  getUserRole() {
+    return this.userRole$.asObservable();
+  } 
 
 }

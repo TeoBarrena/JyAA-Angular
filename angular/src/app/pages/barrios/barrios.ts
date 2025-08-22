@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Navbar } from "../../layout/navbar/navbar";
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment.development';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../auth/auth-service/auth-service';
@@ -19,7 +19,7 @@ import * as L from 'leaflet';
 })
 export class Barrios {
   barrios: any[] = [];
-  rolUser: string | null = null;
+  rolUser: string[] = [];
 
   selectedBarrio: any = {
     nombre: '',
@@ -63,7 +63,9 @@ export class Barrios {
 
   ngOnInit() {
     this.getBarrios();
-    this.rolUser = this.auth.getUserRole();
+    this.auth.getUserRole().subscribe(roles => {
+      this.rolUser = roles;
+    });
   }
 
   ngAfterViewInit() {
@@ -108,13 +110,11 @@ export class Barrios {
   }
 
   saveEdit() {
-    const token = localStorage.getItem('token');
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
 
     this.http.put<any>(
       `${environment.apiUrl}/barrios/${this.selectedBarrio.id}`,
       this.selectedBarrio,
-      { headers }
+      { withCredentials: true }
     ).subscribe({
       next: () => {
         //alert('Barrio actualizado correctamente');        
@@ -207,10 +207,7 @@ renderMaps() {
 
   deleteBarrio(id: number) {
 
-    const token = localStorage.getItem('token'); //agrtego esta lógica para manejar que solanmente los admin puedan eliminar barrios
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`); //dps en el back el BarrioResource recibe y desglosa la http request y se fija que tenga el rol de Admin el que ejecuta la peticion 
-
-    this.http.delete<any>(`${environment.apiUrl}/barrios/deleteBarrio/${id}`, { headers }).subscribe({
+    this.http.delete<any>(`${environment.apiUrl}/barrios/deleteBarrio/${id}`, { withCredentials: true }).subscribe({
       next: () => {
         alert('Barrio eliminado correctamente');
         this.ngOnInit();
@@ -243,12 +240,10 @@ renderMaps() {
   }
 
   guardarCambiosBarrio() {
-    const token = localStorage.getItem('token');
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-
+    
     console.log('Guardando cambios para el barrio:', this.selectedBarrio);
 
-    this.http.put<any>(`${environment.apiUrl}/barrios/updateBarrio/${this.selectedBarrio.id}`, this.selectedBarrio, { headers }).subscribe({
+    this.http.put<any>(`${environment.apiUrl}/barrios/updateBarrio/${this.selectedBarrio.id}`, this.selectedBarrio, { withCredentials: true }).subscribe({
       next: () => {
         alert('Barrio actualizado correctamente');
         this.selectedBarrio = null;
