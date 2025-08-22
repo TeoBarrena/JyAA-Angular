@@ -64,7 +64,7 @@ export class Campanias {
   getCampanias(){
     this.http.get<any>(`${environment.apiUrl}/campanias`).subscribe({
       next: (data) => {
-        console.log('Campañas recibidas:', data);
+        //console.log('Campañas recibidas:', data);
         this.campanias = data;
         this.updatePaginatedCampanias();
       },
@@ -78,7 +78,7 @@ export class Campanias {
   getBarrios() {
     this.http.get<any>(`${environment.apiUrl}/barrios`).subscribe({
       next: (data) => {
-        console.log('Barrios recibidos:', data);
+        //console.log('Barrios recibidos:', data);
         this.barrios = data;
       },
     error: (error) => {
@@ -101,7 +101,7 @@ export class Campanias {
 
       this.http.post<any>(`${environment.apiUrl}/campanias/nuevaCampania`, body, { withCredentials:true }).subscribe({
         next: (data) => {
-          console.log('Campaña creada:', body);
+          //console.log('Campaña creada:', body);
           alert('Campaña creada correctamente');
           this.getCampanias();
           this.resetFormulario();
@@ -160,10 +160,10 @@ export class Campanias {
 
     this.http.put<any>(`${environment.apiUrl}/campanias/editCampania/${this.campaniaEditada.id}`, body, { withCredentials:true }).subscribe({
       next: (data) => {
-        console.log('Campaña actualizada:', body);
+        //console.log('Campaña actualizada:', body);
         alert('Campaña actualizada correctamente');
         this.getCampanias();
-        console.log('Info desde el back:', data);
+        //console.log('Info desde el back:', data);
         const modal = (window as any).bootstrap.Modal.getInstance(document.getElementById('editCampaniaModal'));
         modal.hide();
       },

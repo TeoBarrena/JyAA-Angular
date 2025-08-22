@@ -62,7 +62,7 @@ export class Encuestadores {
     this.http.get<any>(`${environment.apiUrl}/encuestadores`).subscribe({
       next: (data) => {
         this.encuestadores = data;
-        console.log('Encuestadores: ', data);
+        //console.log('Encuestadores: ', data);
         this.getJornadas();
         this.updatePaginatedEncuestadores();
       },
@@ -77,7 +77,7 @@ export class Encuestadores {
     this.http.get<any>(`${environment.apiUrl}/jornadas`).subscribe({
       next: (data) => {
         this.jornadas = data;
-        console.log('Jornadas: ', data);
+        //console.log('Jornadas: ', data);
       },
       error: (error) => {
         console.error('Error fetching jornadas:', error);

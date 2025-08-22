@@ -93,7 +93,7 @@ export class Jornadas {
   getJornadas() {
     this.http.get<any>(`${environment.apiUrl}/jornadas`).subscribe({
       next: (data) => {
-        console.log('Jornadas recibidas:', data);
+        //console.log('Jornadas recibidas:', data);
         this.jornadas = data;
         this.updatePaginatedJornadas();  
       },
@@ -107,7 +107,7 @@ export class Jornadas {
  getCampanias() {
     this.http.get<any>(`${environment.apiUrl}/campanias`).subscribe({
       next: (data) => {
-        console.log('Campañas recibidas:', data);
+        //console.log('Campañas recibidas:', data);
         this.campanias = data;
       },
       error: (error) => {
@@ -120,7 +120,7 @@ export class Jornadas {
  getEncuestadores() {
     this.http.get<any>(`${environment.apiUrl}/encuestadores`).subscribe({
       next: (data) => {
-        console.log('Encuestadores recibidos:', data);
+        //console.log('Encuestadores recibidos:', data);
         this.encuestadores = data;
       },
       error: (error) => {
@@ -154,7 +154,7 @@ export class Jornadas {
  getBarrios() {
     this.http.get<any>(`${environment.apiUrl}/barrios`).subscribe({
       next: (data) => {
-        console.log('Barrios recibidos:', data);
+        //console.log('Barrios recibidos:', data);
         this.barrios = data;
       },
       error: (error) => {

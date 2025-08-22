@@ -70,10 +70,12 @@ export class Usuarios {
 
   getUsers() {
     this.http.get<any[]>(`${environment.apiUrl}/usuarios`).subscribe({
-      next: data => {
-        this.users = data.map(user => {
+      next: (data) => {
+        //this.users = data; 
+         this.users = data.map(user => {
           // Si user.organizacion es un número, buscá el objeto por ID, esto porque me estaba dando error en como me daba los usuarios
           //algunos usuarios venian con organizacion: 1 y otros con organizacion: {id: 1, nombre: 'Org1'}
+          
           if (user.organizacion && typeof user.organizacion === 'number') {
             const org = this.organizaciones.find(o => o.id === user.organizacion);
             if (org) {
@@ -81,7 +83,8 @@ export class Usuarios {
             }
           }
           return user;
-        });
+        }); 
+        
         this.updatePaginatedUsers();
       },
       error: () => {
@@ -97,7 +100,6 @@ export class Usuarios {
         this.organizaciones = data;
       },
       error: () => {
-        //alert('Error al obtener las organizaciones');
         this.toastService.show('error', 'Error al obtener las organizaciones');
       }
     });
@@ -164,7 +166,7 @@ export class Usuarios {
   }
 
   guardarNuevoUsuario() {
-    const body: any = { //que sea de tipo any permite agregar propiedades dinámicamente
+    const body: any = {  
       email: this.newUser.email,
       nombre: this.newUser.nombre,
       apellido: this.newUser.apellido,
@@ -185,32 +187,31 @@ export class Usuarios {
 
     this.http.post(`${environment.apiUrl}/usuarios/nuevoUser`, body, { withCredentials: true }).subscribe({
       next: () => {
-        //alert('Usuario registrado exitosamente');
         this.toastService.show('success', 'Usuario registrado exitosamente');
         this.getUsers();
-        this.resetForm(); // limpiar el formulario
+        this.resetForm();
         const closeModalBtn = document.getElementById('closeModalBtn'); //(para que active el data-bs-dismiss)
         if (closeModalBtn) closeModalBtn.click();
       },
       error: (errorResponse) => {
-        //alert('Error al registrar usuario revise los datos ingresados ');
-        
         const backendMessage = typeof errorResponse.error === 'string' ? errorResponse.error : 'Error al registrar usuario';
         this.toastService.show('error', backendMessage, 8000);
       }
     });
   }
 
-  resetForm(): void {
+  resetForm() {
+    this.editMode = false;
+    this.viewMode = false;
     this.newUser = {
       email: '',
       nombre: '',
       apellido: '',
       password: '',
-      personalSalud: false,
-      organizacion: null,
-      matricula: 0,
       miembroOrg: false,
+      organizacion: null,
+      personalSalud: false,
+      matricula: null,
       admin: false
     };
   }
@@ -237,10 +238,11 @@ export class Usuarios {
       this.newUser.organizacion = null;
     }
   }
-
+/*
   viewUser(userId: number) {
     this.router.navigate(['/user/', userId]); //le pasa por parametro el id del usuario a la ruta
   }
+  */
 
   confirmDelete(userId: number): boolean {
     const confirmed = confirm('¿Estás seguro de que desea eliminar este usuario?');
@@ -255,17 +257,18 @@ export class Usuarios {
 
     this.http.delete(`${environment.apiUrl}/usuarios/deleteUser/${userId}`, { withCredentials: true }).subscribe({
       next: () => {
-        //alert('Usuario eliminado exitosamente');
-        this.toastService.show('success', 'Usuario eliminado exitosamente');
         this.getUsers();
+        (document.getElementById('closeModalBtn') as HTMLElement)?.click();
+        setTimeout(()=>{
+          this.toastService.show('success', 'Usuario eliminado exitosamente');
+        }, 100);
       },
       error: (mensaje) => {
-        //alert('Error al eliminar el usuario ' + mensaje);
-
         this.toastService.show('error', 'Error al eliminar el usuario ' + mensaje);
       }
     });
   }
+
   getTotalPages(): number {
     return Math.ceil(this.filtered.length / this.selectedPageSize);
   }
@@ -302,7 +305,7 @@ export class Usuarios {
     const u = this.newUser;
 
     // Validación de campos básicos
-    const camposObligatorios = u.nombre?.trim() && u.apellido?.trim() && u.email?.trim() && u.password?.trim();
+    const camposObligatorios = u.nombre?.trim() && u.apellido?.trim() && u.email?.trim() && (this.editMode || u.password?.trim());
 
     // Validaciones condicionales
     const requiereMatricula = u.personalSalud ? !!u.matricula : true;

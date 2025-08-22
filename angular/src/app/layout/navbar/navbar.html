@@ -22,54 +22,79 @@
       <!-- Menú centrado -->
       <ul class="navbar-nav mx-auto align-items-center">
 
-        <li class="nav-item"><a class="nav-link text-dark" routerLink="/map">Mapa</a></li>
+        <li class="nav-item mx-1">
+          <a class="nav-link" routerLink="/map" routerLinkActive="text-white bg-primary rounded-1">
+            Mapa
+          </a>
+        </li>
 
-        <!--<li class="nav-item"><a class="nav-link text-dark" routerLink="/users">Usuarios</a></li>-->
-        <li class="nav-item"><a class="nav-link text-dark" routerLink="/usuarios">Usuarios</a></li>
+        <li class="nav-item mx-1">
+          <a class="nav-link" routerLink="/usuarios" routerLinkActive="text-white bg-primary rounded-1">
+            Usuarios
+          </a>
+        </li>
 
-        <li class="nav-item"><a class="nav-link text-dark" routerLink="/barrios">Barrios</a></li>
+        <li class="nav-item mx-1">
+          <a class="nav-link" routerLink="/barrios" routerLinkActive="text-white bg-primary rounded-1">
+            Barrios
+          </a>
+        </li>
 
-        <li class="nav-item"><a class="nav-link text-dark" routerLink="/zonas">Zonas</a></li>
+        <li class="nav-item mx-1">
+          <a class="nav-link" routerLink="/encuestadores" routerLinkActive="text-white bg-primary rounded-1">
+            Encuestadores
+          </a>
+        </li>
 
-        <li class="nav-item"><a class="nav-link text-dark" routerLink="/encuestadores">Encuestadores</a></li>
+        <li class="nav-item mx-1">
+          <a class="nav-link" routerLink="/campanias" routerLinkActive="text-white bg-primary rounded-1">
+            Campañas
+          </a>
+        </li>
 
-        <li class="nav-item"><a class="nav-link text-dark" routerLink="/campanias">Campañas</a></li>
+        <li class="nav-item mx-1">
+          <a class="nav-link" routerLink="/jornadas" routerLinkActive="text-white bg-primary rounded-1">
+            Jornadas
+          </a>
+        </li>
 
-        <li class="nav-item"><a class="nav-link text-dark" routerLink="/jornadas">Jornadas</a></li>
 
-          <li class="nav-item d-inline d-md-none">
-            <a class="nav-link text-dark" (click)="logout()">
-              <i class="bi bi-box-arrow-left fs-2 fw-bold me-2 my-0 py-0"></i> Cerrar sesión
-            </a>
-          </li>
-          <li class="nav-item d-block d-md-none">
-            <a class="nav-link text-dark" routerLink="/perfil">
-              <i class="bi bi-person-circle fs-2 text-primary fw-bold me-2 my-0 py-0"></i> Perfil
-            </a>
-          </li>
+        <li class="nav-item d-inline d-lg-none">
+          <a class="nav-link text-primary" (click)="logout()">
+            <i class="bi bi-box-arrow-left fs-2 fw-bold me-2 my-0 py-0" routerLinkActive="text-white bg-primary rounded-1"></i> Cerrar sesión
+          </a>
+        </li>
+        <li class="nav-item d-block d-lg-none">
+          <a class="nav-link text-primary" routerLink="/perfil" routerLinkActive="text-white bg-primary rounded-1">
+            <i class="bi bi-person-circle fs-2 fw-bold me-2 my-0 py-0"></i> Perfil
+          </a>
+        </li>
       </ul>
 
-      
-        <ul class="d-none d-md-block navbar-nav align-items-center">
-          <li class="nav-item">
-            <i class="bi bi-box-arrow-left fs-4 fw-bold " (click)="logout()"></i>
-          </li>
-          <li class="nav-item dropdown">
-            <button class="btn btn-primary rounded-circle" data-bs-toggle="dropdown" aria-expanded="false">
-              <i class="bi bi-person fs-4 fw-bold"></i>
-            </button>
-            <ul class="dropdown-menu">
-              <li><a class="dropdown-item" href="#">Action</a></li>
-              <li><a class="dropdown-item" href="#">Another action</a></li>
-              <li><a class="dropdown-item" href="#">Something else here</a></li>
-            </ul>
-          </li>
 
-        </ul>
-      
+      <ul class="d-none d-lg-block navbar-nav align-items-center ms-auto">
+        <li class="nav-item">
+        </li>
+        <li class="nav-item dropdown">
+          <button class="btn btn-primary rounded-circle" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-person fs-4 fw-bold"></i>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end mt-1">
+            <li><button class="dropdown-item d-flex justify-content-center align-items-center text-primary"
+                (click)="logout()" routerLinkActive="text-white bg-primary rounded-1">
+                <i class="bi bi-box-arrow-left fs-4 fw-bold me-2 my-0 py-0"></i> Cerrar sesión</button></li>
+            <li><a class="dropdown-item d-flex justify-content-center align-items-center  text-primary"
+                routerLink="/perfil" routerLinkActive="text-white bg-primary rounded-1">
+                <i class="bi bi-person-circle fs-4 fw-bold me-2 my-0 py-0"></i>Perfil
+              </a></li>
+          </ul>
+        </li>
+
+      </ul>
+
       <!-- Íconos a la derecha -->
       <div class="d-flex align-items-center ms-auto gap-2">
-        
+
         <!--
           <img src="/cerrar-sesion.png" alt="Cerrar sesión" class="icon-img" (click)="logout()" />-->
         <!--

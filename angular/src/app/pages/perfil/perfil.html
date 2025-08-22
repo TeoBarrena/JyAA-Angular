@@ -1,0 +1,105 @@
+<app-navbar></app-navbar>
+<div class="container pt-5 mb-4 px-4 d-flex justify-content-center align-items-center" style="min-height: 75vh;">
+    <div class="spinner-border" role="status" *ngIf="!usuario">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+    <div class="row g-4" *ngIf="usuario">
+
+        <div class="col-12 col-lg-4 d-flex justify-content-center align-items-center">
+            <i class="bi bi-person-circle fw-bold" style="font-size: 120px;"></i>
+        </div>
+
+        <div class="col-12 col-lg-8">
+            <div class="row g-3">
+                <div class="col-12">
+                    <h3>{{ usuario.nombre }} {{ usuario.apellido }}</h3>
+                </div>
+
+                <div class="col-12">
+                    <h6>{{ usuario.email }}</h6>
+                </div>
+
+                <div class="col-12" *ngIf="usuario.roles">
+                    <div class="">
+                        <h6>Roles</h6>
+                        <ul *ngFor="let rol of usuario.roles">
+                            <li>{{rol.nombre}}</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="col-12" *ngIf="usuario.matricula">
+                    <div class="">
+                        <h6>Personal de Salud</h6>
+                        <h6>Numero de matricula {{usuario.matricula}}</h6>
+                    </div>
+                </div>
+
+                <div class="col-12" *ngIf="usuario.organizaciones">
+                    <div class="">
+                        <h6>Organizaciones a las que pertenece</h6>
+                        <ul *ngFor="let org of usuario.organizaciones">
+                            <li>{{org.nombre}}</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-12 d-flex justify-content-end align-items-center mt-3">
+                    <button class="btn btn-outline-primary me-3" data-bs-toggle="modal"
+                        data-bs-target="#modalCambiarContraseña">
+                        <i class="bi bi-key fw-bold me-2 my-0 py-0"></i>
+                        Cambiar contraseña
+                    </button>
+                    <button class="btn btn-outline-secondary" (click)="logout()">
+                        <i class="bi bi-box-arrow-left fw-bold me-2 my-0 py-0"></i>
+                        Cerrar sesión
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!--MODAL CONTRASEÑA-->
+        <div class="modal fade" id="modalCambiarContraseña" tabindex="-1" aria-labelledby="modalCambiarContraseñaLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="modalCambiarContraseñaLabel">Cambiar contraseña</h1>
+                        <button type="button" id="closeBtn" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                            (click)="cancelar()"></button>
+                    </div>
+                    <div class="modal-body p-4">
+                        <div class="row g-3 mx-3">
+                            <input type="password" class="mb-3 form-control " id="inputcontr1"
+                                [class.is-invalid]="errMsj[0]" placeholder="Ingrese su contraseña actual"
+                                [(ngModel)]="passwordActual">
+                            <div class="invalid-feedback" *ngIf="errMsj[0]">
+                                {{ errMsj[0] }}
+                            </div>
+
+                            <hr class="mt-3 w-75 mx-auto">
+
+                            <input type="password" class="form-control " id="inputcontr2" [class.is-invalid]="errMsj[1]"
+                                placeholder="Contraseña nueva" [(ngModel)]="pass1">
+                            <div class="invalid-feedback" *ngIf="errMsj[1]">
+                                {{ errMsj[1] }}
+                            </div>
+
+                            <input type="password" class="form-control " id="inputcontr3" [class.is-invalid]="errMsj[2]"
+                                placeholder="Confirmar contraseña" [(ngModel)]="pass2">
+                            <div class="invalid-feedback" *ngIf="errMsj[2]">
+                                {{ errMsj[2] }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-primary" (click)="cambiarContrasenia()">
+                            <i class="bi bi-check-lg"></i> Aceptar
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal"
+                            (click)="cancelar()">
+                            <i class="bi bi-x-lg"></i>Cancelar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
