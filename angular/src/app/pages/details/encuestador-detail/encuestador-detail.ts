@@ -21,20 +21,22 @@ export class EncuestadorDetail {
   encuestadorEditado: any = {};
 
   encuestadorId: number | null = null;
-  rolUser: string | null = null;
+  rolUser: string[] = [];
 
   jornadas: any[] = [];
   selectedJornadaId: number | null = null;
 
   constructor(
     private http: HttpClient,
-    private authService: AuthService,
+    private auth: AuthService,
     private route: ActivatedRoute,
     private toastService: ToastService,
   ) { }
 
   ngOnInit() {
-    this.rolUser = this.authService.getUserRole();
+    this.auth.getUserRole().subscribe(roles => {
+      this.rolUser = roles;
+    });
     this.encuestadorId = Number(this.route.snapshot.paramMap.get('id'));
     this.loadEncuestadorDetails();
   }
@@ -96,9 +98,8 @@ export class EncuestadorDetail {
   };
 
   console.log('Enviando al back para actualizar:', body);
-  const headers = this.authService.getHeaderHttp();
 
-  this.http.put<any>(`${environment.apiUrl}/encuestadores/editEncuestador/${this.encuestadorId}`, body, { headers }).subscribe({
+  this.http.put<any>(`${environment.apiUrl}/encuestadores/editEncuestador/${this.encuestadorId}`, body, { withCredentials: true }).subscribe({
     next: (data) => {
       this.toastService.show('success', 'Encuestador actualizado correctamente');
       this.loadEncuestadorDetails();

@@ -17,42 +17,42 @@
     </button>
 
     <!-- Sección colapsable -->
-    <div class="collapse navbar-collapse" id="navbarNav" *ngIf="auth.isLoggedIn()">
+    <div class="collapse navbar-collapse" id="navbarNav" *ngIf="auth.isLoggedIn | async">
 
       <!-- Menú centrado -->
       <ul class="navbar-nav mx-auto align-items-center">
 
-        <li class="nav-item mx-1">
+        <li class="nav-item mx-1" *ngIf="auth.checkPermiso('VER_MAPAS')">
           <a class="nav-link" routerLink="/map" routerLinkActive="text-white bg-primary rounded-1">
             Mapa
           </a>
         </li>
 
-        <li class="nav-item mx-1">
+        <li class="nav-item mx-1"  *ngIf="auth.checkPermiso('GET_USUARIO')">
           <a class="nav-link" routerLink="/usuarios" routerLinkActive="text-white bg-primary rounded-1">
             Usuarios
           </a>
         </li>
 
-        <li class="nav-item mx-1">
+        <li class="nav-item mx-1" *ngIf="auth.checkPermiso('GET_BARRIO')">
           <a class="nav-link" routerLink="/barrios" routerLinkActive="text-white bg-primary rounded-1">
             Barrios
           </a>
         </li>
 
-        <li class="nav-item mx-1">
+        <li class="nav-item mx-1" *ngIf="auth.checkPermiso('GET_ENCUESTADOR')">
           <a class="nav-link" routerLink="/encuestadores" routerLinkActive="text-white bg-primary rounded-1">
             Encuestadores
           </a>
         </li>
 
-        <li class="nav-item mx-1">
+        <li class="nav-item mx-1"  *ngIf="auth.checkPermiso('GET_CAMPAÑA')">
           <a class="nav-link" routerLink="/campanias" routerLinkActive="text-white bg-primary rounded-1">
             Campañas
           </a>
         </li>
 
-        <li class="nav-item mx-1">
+        <li class="nav-item mx-1" *ngIf="auth.checkPermiso('GET_JORNADA')">
           <a class="nav-link" routerLink="/jornadas" routerLinkActive="text-white bg-primary rounded-1">
             Jornadas
           </a>
@@ -94,19 +94,25 @@
       </ul>
 
       <!-- Íconos a la derecha -->
+      
+              <!--
       <div class="d-flex align-items-center ms-auto gap-2">
-
-        <!--
           <img src="/cerrar-sesion.png" alt="Cerrar sesión" class="icon-img" (click)="logout()" />-->
         <!--
         <div class="user-icon">
           <img src="/logo-usuario.png" alt="Perfil" style="width: 30px; height: 30px;" />
-        </div>-->
-      </div>
+        </div>
+      </div>-->
     </div>
-    
+
+    <!--
     <div *ngIf="showLoginButton()" class="ms-auto nav-item">
       <a routerLink="/login" class="nav-link btn bt-n-outline-primary ">Iniciar sesión</a>
+    </div>
+-->
+    <div *ngIf="!(auth.isLoggedIn | async ) && checkUrl()" class="ms-auto d-flex gap-2">
+      <a routerLink="/login" class="btn btn-sm btn-outline-primary text-white">Iniciar sesión</a>
+      <a routerLink="/register" class="btn btn-sm btn-outline-primary">Registrarse</a>
     </div>
 
   </div>

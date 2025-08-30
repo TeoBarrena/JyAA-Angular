@@ -3,7 +3,7 @@
     <div class="row gy-3">
         <span class="d-flex justify-content-between align-items-center">
             <h5 class="fw-bold text-primary ">Barrios</h5>
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addBarrioModal"
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addBarrioModal" *ngIf="auth.checkPermiso('CREATE_BARRIO')"
                 (click)="openNew()"><i class="bi bi-plus me-2"></i>Añadir barrio</button>
         </span>
 
@@ -40,7 +40,7 @@
 
             <!-- Lista real de barrios -->
             <div class="row gy-4 row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4 row-cols-xxl-5  "
-                *ngIf="barrios && barrios.length > 0">
+                *ngIf="(barrios && barrios.length > 0 ) && auth.checkPermiso('GET_BARRIO')">
                 <div class="col" *ngFor="let barrio of barrios; let i = index">
                     <div class="card card-lista shadow-sm" (click)="openDetalle(i)">
                         <div class="card-img-top bg-primary" style="height: 9rem;">
@@ -118,7 +118,7 @@
                                         <div class="me-auto">
                                             <p>Zonas</p>
                                         </div>
-                                        <button class="btn btn-light w-100 p-0 mx-auto" *ngIf="editMode"
+                                        <button class="btn btn-light w-100 p-0 mx-auto" *ngIf="editMode  && auth.checkPermiso('CREATE_ZONA')"
                                             data-bs-toggle="modal" data-bs-target="#modalAgregarZona"
                                             (click)="abrirModalAgregarZona()">
                                             <i class="bi bi-plus-lg fw-bold fs-5"></i>
@@ -135,11 +135,11 @@
                                             <div class="ms-1 me-auto my-2">{{ zona.nombre }}</div>
                                             <button
                                                 class="btn btn-light  h-100 m-0 rounded-start-0 border-end-0 rounded-end-0"
-                                                *ngIf="editMode" data-bs-toggle="modal"
+                                                *ngIf="editMode && auth.checkPermiso('UPDATE_ZONA')" data-bs-toggle="modal"
                                                 data-bs-target="#modalAgregarZona" (click)="editarZonaExistente(i)">
                                                 <i class="bi bi-pencil fw-bold fs-6  "></i>
                                             </button>
-                                            <button class="btn btn-light  h-100 m-0 rounded-start-0 " *ngIf="editMode"
+                                            <button class="btn btn-light  h-100 m-0 rounded-start-0 " *ngIf="editMode && auth.checkPermiso('DELETE_ZONA')"
                                                 (click)="confirmDeleteZona(zona.id)">
                                                 <i class="bi bi-trash fw-bold fs-6  "></i>
                                             </button>
@@ -152,15 +152,14 @@
 
 
                                 <!-- Botones -->
-                                <span class="d-flex justify-content-end align-self-end mt-4"
-                                    *ngIf="rolUser === 'Admin'">  <!-- CAMBIAR POR EL SERVICE -->
+                                <span class="d-flex justify-content-end align-self-end mt-2" ><!-- CAMBIAR POR EL SERVICE - *ngIf="rolUser?.includes('Admin')"-->
                                     <!-- Botones de solo lectura -->
                                     <ng-container *ngIf="!editMode">
-                                        <button class="btn btn-outline-primary me-2" title="Editar"
+                                        <button class="btn btn-outline-primary me-2" title="Editar" *ngIf="auth.checkPermiso('UPDATE_BARRIO')"
                                             (click)="enableEdit()">
                                             <i class="bi bi-pencil"></i> Editar
                                         </button>
-                                        <button class="btn btn-outline-danger" title="Eliminar"
+                                        <button class="btn btn-outline-danger" title="Eliminar" *ngIf="auth.checkPermiso('DELETE_BARRIO')"
                                             (click)="confirmDelete(selectedBarrio.id)">
                                             <i class="bi bi-trash"></i> Eliminar
                                         </button>
@@ -183,7 +182,7 @@
             </div>
         </div>
     </div>
-    <!-- Modal agregar zona --><!-- Modal Agregar Zona -->
+    <!-- Modal agregar zona -->
     <div class="modal fade" id="modalAgregarZona" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-fullscreen-lg-down modal-xl">
             <div class="modal-content">
@@ -335,7 +334,7 @@
 
                                 <span class="d-flex justify-content-end align-self-end mt-4">
                                     <ng-container>
-                                        <button class="btn btn-outline-primary me-2" (click)="addBarrio()">
+                                        <button class="btn btn-outline-primary me-2" (click)="addBarrio()" *ngIf="auth.checkPermiso('CREATE_BARRIO')">
                                             <i class="bi bi-plus-lg me-2"></i> Añadir barrio
                                         </button>
                                         <button class="btn btn-outline-secondary" (click)="cancelar()"

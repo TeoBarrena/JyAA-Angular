@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Navbar } from "../../layout/navbar/navbar";
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment.development';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../auth/auth-service/auth-service';
@@ -10,7 +10,8 @@ import { Router } from '@angular/router';
 import { ToastService } from '../../layout/notificaciones/toast.service';
 import { Input } from '@angular/core';
 import * as L from 'leaflet';
-import { Observable, switchMap, tap } from 'rxjs';
+import { Observable, switchMap, tap, of } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
 
 @Component({
   selector: 'app-barrios',
@@ -20,7 +21,7 @@ import { Observable, switchMap, tap } from 'rxjs';
 })
 export class Barrios {
   barrios: any[] = [];
-  rolUser: string | null = null;
+  //rolUser: string[] | null = null;
 
   selectedBarrio: any = {
     nombre: '',
@@ -55,19 +56,16 @@ export class Barrios {
   constructor(
     private toastService: ToastService, //Notificaciones
     private http: HttpClient,
-    private auth: AuthService,
+    public auth: AuthService,
     private router: Router,
   ) { }
 
-  /*
-    ngOnInit() {
-      this.getBarrios();
-      this.rolUser = this.auth.getUserRole();
-    }
-    */
   ngOnInit() {
     this.getBarrios().subscribe(() => {
-      this.rolUser = this.auth.getUserRole();
+      /*this.auth.getUserRole().subscribe(role => {
+        this.rolUser = role;
+      }); */
+
       setTimeout(() => {
         this.renderMaps();
       }, 20);
@@ -223,13 +221,10 @@ export class Barrios {
   }
 
   saveEdit() {
-    const token = localStorage.getItem('token');
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-
     this.http.put<any>(
       `${environment.apiUrl}/barrios/${this.selectedBarrio.id}`,
       this.selectedBarrio,
-      { headers }
+      { withCredentials: true }
     )
       .pipe(
         tap(() => {
@@ -249,35 +244,20 @@ export class Barrios {
         },
         error: (error) => {
           console.error('Error al actualizar el barrio:', error);
-          this.toastService.show('error-outline', 'Error al actualizar el barrio');
+          this.toastService.show('error-outline', 'Error al actualizar el barrio, '+ error.error, 8000);
         }
       });
-    /*
-      this.http.put<any>(
-        `${environment.apiUrl}/barrios/${this.selectedBarrio.id}`,
-        this.selectedBarrio,
-        { headers }
-      ).subscribe({
-        next: () => {
-          this.toastService.show('success-outline', 'Barrio actualizado correctamente');
-          this.editMode = false;
-          this.ngOnInit();
-          setTimeout(() => {
-            this.createModalMap();
-          }, 20);
-        },
-        error: (error) => {
-          console.error('Error al actualizar el barrio:', error);
-          this.toastService.show('error-outline', 'Error al actualizar el barrio');
-        }
-      });
-      */
   }
 
   getBarrios(): Observable<any> {
     return this.http.get<any>(`${environment.apiUrl}/barrios`).pipe(
       tap((data) => {
         this.barrios = data;
+      }),
+      catchError((error) => {
+        console.error('Error al obtener los barrios:', error);
+        this.toastService.show("error", "Error al obtener los barrios. " + error.error, 8000);
+        return of([]);
       })
     );
   }
@@ -295,14 +275,14 @@ export class Barrios {
           attributionControl: false,
           minZoom: 11,
           maxZoom: 14,
-          zoom: 14, 
-          dragging: false,     
-          scrollWheelZoom: false,  
-          doubleClickZoom: false, 
-          boxZoom: false,  
-          keyboard: false, 
+          zoom: 14,
+          dragging: false,
+          scrollWheelZoom: false,
+          doubleClickZoom: false,
+          boxZoom: false,
+          keyboard: false,
           touchZoom: false,
-          zoomControl: false, 
+          zoomControl: false,
         }).setView([lat, lng], 16);
 
         L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
@@ -335,7 +315,7 @@ export class Barrios {
         console.error('Error al agregar el barrio:', error);
         //alert('Error al agregar el barrio');
 
-        this.toastService.show("error", "Error al agregar el barrio");
+        this.toastService.show("error", "Error al agregar el barrio, "+ error.error, 8000);
       }
     })
   }
@@ -350,11 +330,7 @@ export class Barrios {
   }
 
   deleteBarrio(id: number) {
-    const token = localStorage.getItem('token'); //agrtego esta lógica para manejar que solanmente los admin puedan eliminar barrios
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`); //dps en el back el BarrioResource recibe y desglosa la http request y se fija que tenga el rol de Admin el que ejecuta la peticion 
-    console.log("Token en deleteBarrio:", token);
-
-    this.http.delete<any>(`${environment.apiUrl}/barrios/deleteBarrio/${id}`, { headers }).subscribe({
+    this.http.delete<any>(`${environment.apiUrl}/barrios/deleteBarrio/${id}`, { withCredentials: true }).subscribe({
       next: () => {
         //alert('Barrio eliminado correctamente');
         this.toastService.show("success", "Barrio eliminado correctamente");
@@ -371,7 +347,7 @@ export class Barrios {
         console.error('Error al eliminar el barrio:', error);
         //alert('Error al eliminar el barrio');
 
-        this.toastService.show("error", "Error al eliminar el barrio, " + error.message, 8000);
+        this.toastService.show("error", "Error al eliminar el barrio, " + error.error, 8000);
       }
     })
   }
@@ -389,10 +365,7 @@ export class Barrios {
   }
 
   deleteZona(id: number) {
-    const token = localStorage.getItem('token');
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-
-    this.http.delete<any>(`${environment.apiUrl}/zonas/${id}`, { headers }).subscribe({
+    this.http.delete<any>(`${environment.apiUrl}/zonas/${id}`, { withCredentials: true }).subscribe({
       next: () => {
         this.toastService.show("success-outline", "Zona eliminada correctamente");
         this.selectedBarrio.zonas = this.selectedBarrio.zonas.filter((z: { id: number; }) => z.id !== id);
@@ -403,7 +376,7 @@ export class Barrios {
       },
       error: (error) => {
         console.error('Error al eliminar la zona:', error);
-        this.toastService.show("error", "Error al eliminar la zona, " + error.message, 8000);
+        this.toastService.show("error", "Error al eliminar la zona, " + error.error, 8000);
       }
     })
   }
@@ -493,13 +466,11 @@ export class Barrios {
   }
 
   guardarNuevaZona() {
-    const token = localStorage.getItem('token');
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
     const body = {
       ...this.nuevaZona,
       barrio: { id: this.selectedBarrio.id }
     };
-    this.http.post<any>(`${environment.apiUrl}/zonas/nuevaZona`, body, { headers })
+    this.http.post<any>(`${environment.apiUrl}/zonas/nuevaZona`, body, { withCredentials: true })
       .pipe(
         switchMap(() => this.getBarrios()) // wait for barrios to refresh
       )
@@ -517,29 +488,9 @@ export class Barrios {
         },
         error: (err) => {
           console.error(err);
-          this.toastService.show("error", "Error al crear la zona");
+          this.toastService.show("error", "Error al crear la zona, "+ err.error, 8000);
         }
       });
-
-    /*
-        this.http.post<any>(`${environment.apiUrl}/zonas/nuevaZona`, body, { headers }).subscribe({
-          next: () => {
-            this.ngOnInit();
-            setTimeout(() => {
-              this.selectedBarrio.zonas = JSON.parse(JSON.stringify(this.barrios[this.ogSelectedBarrio].zonas));
-              (document.getElementById('cancelarAgregarZonaBtn') as HTMLElement)?.click();
-              this.toastService.show("success-outline", "Zona creada correctamente");
-              setTimeout(() => {
-                this.createModalMap();
-              }, 200);
-            }, 200);
-    
-          },
-          error: (err) => {
-            console.error(err);
-            this.toastService.show("error", "Error al crear la zona");
-          }
-        }); */
   }
 
   cancelarNuevaZona() {
@@ -573,14 +524,12 @@ export class Barrios {
   editarZona: boolean = false;
 
   guardarZonaExistente() {
-    const token = localStorage.getItem('token');
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
     const body = {
       ...this.nuevaZona,
       id: this.editarZonaId,
       barrio: { id: this.selectedBarrio.id }
     };
-    this.http.put<any>(`${environment.apiUrl}/zonas/${this.editarZonaId}`, body, { headers })
+    this.http.put<any>(`${environment.apiUrl}/zonas/${this.editarZonaId}`, body, { withCredentials: true })
       .pipe(
         switchMap(() => this.getBarrios())
       )
@@ -598,29 +547,9 @@ export class Barrios {
         },
         error: (err) => {
           console.error(err);
-          this.toastService.show("error", "Error al actualizar la zona");
+          this.toastService.show("error", "Error al actualizar la zona. "+ err.error, 8000);
         }
       });
-
-    /* 
-        this.http.put<any>(`${environment.apiUrl}/zonas/${this.editarZonaId}`, body, { headers }).subscribe({
-          next: () => {
-            this.ngOnInit();
-            setTimeout(() => {
-              this.selectedBarrio.zonas = JSON.parse(JSON.stringify(this.barrios[this.ogSelectedBarrio].zonas));
-              (document.getElementById('cancelarAgregarZonaBtn') as HTMLElement)?.click();
-              this.toastService.show("success-outline", "Zona actualizada correctamente");
-              setTimeout(() => {
-                this.createModalMap();
-              }, 500);
-            }, 500);
-    
-          },
-          error: (err) => {
-            console.error(err);
-            this.toastService.show("error", "Error al crear la zona");
-          }
-        }); */
   }
 
   editarZonaId: number | null = null;

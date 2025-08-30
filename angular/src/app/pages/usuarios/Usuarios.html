@@ -3,7 +3,8 @@
   <div class="row gy-3">
     <span class="d-flex justify-content-between align-items-center">
       <h5 class="fw-bold text-primary ">Cuentas de Usuario</h5>
-      <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal"><i
+      <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal"
+      *ngIf="auth.checkPermiso('CREATE_USUARIO')"><i
           class="bi bi-plus me-2"></i>Añadir usuario</button>
     </span>
     <span class="d-flex justify-content-between align-items-center">
@@ -48,7 +49,7 @@
     </span>
 
     <div class="table-responsive" *ngIf="users.length === 0">
-      <table class="table table-hover nomidborder-table ">
+      <table class="table table-hover nomidborder-table " >
         <tbody>
           <tr *ngFor="let num of [].constructor(selectedPageSize); let i = index">
             <td style="min-width:170px; width:240px;">
@@ -86,7 +87,7 @@
     </div>
 
     <div class="table-responsive" *ngIf="paginatedUsers && paginatedUsers.length > 0">
-      <table class="table table-hover nomidborder-table ">
+      <table class="table table-hover nomidborder-table " *ngIf="auth.checkPermiso('GET_USUARIO')">
         <tbody>
           <tr *ngFor="let user of paginatedUsers; let i = index;">
             <td (click)="viewUser(i)" [ngStyle]="{ cursor: 'pointer' }" data-bs-toggle="modal"
@@ -110,7 +111,7 @@
                   'bg-success-subtle': user.estado === 'HABILITADO',
                   'bg-danger-subtle': user.estado === 'DESHABILITADO',
                   'bg-warning-subtle': user.estado === 'PENDIENTE'
-                }" (change)="cambiarEstado(user.id,user.estado)" *ngIf="user.id != currentUserId">
+                }" (change)="cambiarEstado(user.id,user.estado)" *ngIf="user.id != currentUserId && auth.checkPermiso('UPDATE_USUARIO')">
                 <option [value]="'HABILITADO'">Habilitado</option>
                 <option [value]="'DESHABILITADO'">Deshabilitado</option>
                 <option [value]="'PENDIENTE'">Pendiente</option>
@@ -120,14 +121,14 @@
               <button
                 class="w-100 p-2 border-0 rounded-0 h-100 btn btn-outline-primary d-flex justify-content-center align-items-center fw-bold"
                 (click)="editUser(i)" [ngStyle]="{ cursor: 'pointer' }" data-bs-toggle="modal"
-                data-bs-target="#addUserModal" *ngIf="user.id != currentUserId">
+                data-bs-target="#addUserModal" *ngIf="user.id != currentUserId && auth.checkPermiso('UPDATE_USUARIO')">
                 <i class="bi bi-pencil"></i>
               </button>
             </td>
             <td class="p-0" style="min-width:40; width:40px;">
               <button
                 class="w-100 p-2 border-0 rounded-0 h-100 btn btn-outline-danger d-flex justify-content-center align-items-center fw-bold"
-                (click)="confirmDelete(user.id)" *ngIf="user.id != currentUserId">
+                (click)="confirmDelete(user.id)" *ngIf="user.id != currentUserId && auth.checkPermiso('DELETE_USUARIO')" >
                 <i class="bi bi-trash"></i>
               </button>
             </td>
@@ -269,18 +270,18 @@
 
       <div class="modal-footer">
         <!-- Modo vista -->
-        <button type="button" class="btn btn-outline-primary" (click)="editUser(null)" *ngIf="!editMode && viewMode"><i
+        <button type="button" class="btn btn-outline-primary" (click)="editUser(null)" *ngIf="!editMode && viewMode && auth.checkPermiso('UPDATE_USUARIO')"><i
             class="bi bi-pencil"></i> Editar</button>
 
         <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal" (click)="confirmDelete(newUser.id)"
-          *ngIf="!editMode && viewMode"><i class="bi bi-trash"></i> Eliminar</button>
+          *ngIf="!editMode && viewMode && auth.checkPermiso('DELETE_USUARIO')"><i class="bi bi-trash"></i> Eliminar</button>
 
         <!-- modo edicion / agregar -->
         <button type="button" class="btn btn-primary" (click)="guardarNuevoUsuario()" [disabled]="!formularioValido"
-          *ngIf="!editMode && !viewMode">Guardar</button>
+          *ngIf="!editMode && !viewMode && auth.checkPermiso('CREATE_USUARIO')">Guardar</button>
 
         <button type="button" class="btn btn-primary" (click)="guardarUsuario()" [disabled]="!formularioValido"
-          *ngIf="editMode && !viewMode">Guardar cambios</button>
+          *ngIf="editMode && !viewMode && auth.checkPermiso('UPDATE_USUARIO')">Guardar cambios</button>
 
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="resetForm()"
           *ngIf="!viewMode">Cancelar</button>

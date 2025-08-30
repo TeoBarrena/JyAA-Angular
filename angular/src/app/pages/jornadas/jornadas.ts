@@ -6,15 +6,16 @@ import { environment } from '../../../environments/environment.development';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { ToastService } from '../../layout/notificaciones/toast.service';
 
 //lógica de encuestadores seleccionados
-interface Encuestador{
+interface Encuestador {
   id: number;
   nombre: string;
 }
 
 //lógica de zonas seleccionadas para el barrio que se elige
-interface Zona{
+interface Zona {
   id: number;
   nombre: string;
 }
@@ -35,7 +36,7 @@ interface JornadaEditada {
 export class Jornadas {
 
   jornadas: any[] = [];
-  rolUser: string | null = null;
+  rolUser: string[] = [];
   campanias: any[] = [];
   zonas: any[] = [];
   barrios: any[] = [];
@@ -69,19 +70,22 @@ export class Jornadas {
   }
 
   jornadaEditada: JornadaEditada = {
-  id: null,
-  fecha: '',
-  zonas: [],
-  encuestadores: [],
+    id: null,
+    fecha: '',
+    zonas: [],
+    encuestadores: [],
   };
 
   constructor(
+    private toastService: ToastService,
     private http: HttpClient,
-    private auth: AuthService,
-  ){}
+    public auth: AuthService,
+  ) { }
 
   ngOnInit() {
-    this.rolUser = this.auth.getUserRole();
+    this.auth.getUserRole().subscribe(roles => {
+      this.rolUser = roles;
+    });
     this.getJornadas();
     this.getCampanias();
     this.getBarrios();
@@ -93,16 +97,17 @@ export class Jornadas {
       next: (data) => {
         //console.log('Jornadas recibidas:', data);
         this.jornadas = data;
-        this.updatePaginatedJornadas();  
+        this.updatePaginatedJornadas();
       },
       error: (error) => {
         console.error('Error al obtener las jornadas:', error);
-        alert('Error al obtener las jornadas');
+        this.toastService.show("error", 'Error al obtener las jornadas, ' + error.error, 8000);
+        //alert('Error al obtener las jornadas');
       }
-   })
- }
+    })
+  }
 
- getCampanias() {
+  getCampanias() {
     this.http.get<any>(`${environment.apiUrl}/campanias`).subscribe({
       next: (data) => {
         //console.log('Campañas recibidas:', data);
@@ -110,12 +115,12 @@ export class Jornadas {
       },
       error: (error) => {
         console.error('Error al obtener las campañas:', error);
-        alert('Error al obtener las campañas');
+        this.toastService.show("error", 'Error al obtener las campañas, ' + error.error, 8000);
       }
     })
- }
+  }
 
- getEncuestadores() {
+  getEncuestadores() {
     this.http.get<any>(`${environment.apiUrl}/encuestadores`).subscribe({
       next: (data) => {
         //console.log('Encuestadores recibidos:', data);
@@ -123,10 +128,10 @@ export class Jornadas {
       },
       error: (error) => {
         console.error('Error al obtener los encuestadores:', error);
-        alert('Error al obtener los encuestadores');
+        this.toastService.show("error", 'Error al obtener los encuestadores, ' + error.error, 8000);
       }
     })
- }
+  }
 
   getAvailableEncuestadores() {
     // Devuelve solo encuestadores que no estén ya en nuevaJornada.encuestadores
@@ -149,7 +154,7 @@ export class Jornadas {
     this.nuevaJornada.encuestadores = this.nuevaJornada.encuestadores.filter(e => e.id !== encuestadorId);
   }
 
- getBarrios() {
+  getBarrios() {
     this.http.get<any>(`${environment.apiUrl}/barrios`).subscribe({
       next: (data) => {
         //console.log('Barrios recibidos:', data);
@@ -157,103 +162,102 @@ export class Jornadas {
       },
       error: (error) => {
         console.error('Error al obtener los barrios:', error);
-        alert('Error al obtener los barrios');
-      } 
-    })
- }
-
- onCampaniaChange() {
-  if (this.nuevaJornada.campania?.barrio) {
-    // Guardamos el ID del barrio (opcional si querés mantenerlo)
-    this.nuevaJornada.barrioId = this.nuevaJornada.campania.barrio.id;
-
-    // Buscar las zonas del barrio seleccionado
-    this.zonasBarrio = this.barrios.find(
-      b => b.id === this.nuevaJornada.barrioId
-    )?.zonas || [];
-
-    // Filtrar zonas seleccionadas que ya no estén disponibles
-    this.nuevaJornada.zonas = this.nuevaJornada.zonas.filter(
-      z => this.zonasBarrio.some(zb => zb.id === z.id)
-    );
-  } else {
-    // Si no hay campaña seleccionada, limpiar todo
-    this.nuevaJornada.barrioId = null;
-    this.zonasBarrio = [];
-    this.nuevaJornada.zonas = [];
-  }
-}
-
- onBarrioChange() {
-  if (this.nuevaJornada.barrioId) {
-    this.zonasBarrio = this.barrios.find(b => b.id === this.nuevaJornada.barrioId)?.zonas || [];
-
-    this.nuevaJornada.zonas = this.nuevaJornada.zonas.filter(z =>this.zonasBarrio.some(zb => zb.id === z.id));
-  }
-  else {
-    this.zonasBarrio = [];
-    this.nuevaJornada.zonas = [];
-  }
- }
-
- getAvailableZonas() {
-  return this.zonasBarrio.filter(z =>
-    !this.nuevaJornada.zonas.some(sel => sel.id === z.id)
-  );
-}
-
- addZona() {
-  if (this.selectedZonaId) {
-    const zona = this.zonasBarrio.find(z => z.id === this.selectedZonaId);
-    if (zona && !this.nuevaJornada.zonas.some(z => z.id === zona.id)) {
-      this.nuevaJornada.zonas.push(zona);
-    }
-    this.selectedZonaId = null; // Resetear select
-  }
-}
- removeZona(zonaId: number){
-  this.nuevaJornada.zonas = this.nuevaJornada.zonas.filter(z => z.id !== zonaId);
- }
-
- crearJornada() {
-  const headers = this.auth.getHeaderHttp();
-  const body = {
-    fecha: this.nuevaJornada.fecha,
-    campaña: this.nuevaJornada.campania,
-    zonas: this.nuevaJornada.zonas,
-    encuestadores: this.nuevaJornada.encuestadores,
-  }
-  console.log('Cuerpo de la solicitud:', body);
-  this.http.post(`${environment.apiUrl}/jornadas/nuevaJornada`, body, { headers }).subscribe({
-    next: (data) => {
-      alert('Jornada creada correctamente');
-      this.getJornadas();
-      this.reset();
-      const modalElement = document.getElementById('addJornadaModal');
-      if (modalElement) {
-        const modal = (window as any).bootstrap.Modal.getInstance(modalElement)
-                  || new (window as any).bootstrap.Modal(modalElement);
-        modal.hide();
+        this.toastService.show("error", 'Error al obtener los barrios, ' + error.error, 8000);
       }
-    },
-    error: (error) => {
-      console.error('Error al crear la jornada:', error);
-      alert('Error al crear la jornada');
-    }
-  })
- }
+    })
+  }
 
- //se encarga de hacer una copia y abrir el modal
+  onCampaniaChange() {
+    if (this.nuevaJornada.campania?.barrio) {
+      // Guardamos el ID del barrio (opcional si querés mantenerlo)
+      this.nuevaJornada.barrioId = this.nuevaJornada.campania.barrio.id;
+
+      // Buscar las zonas del barrio seleccionado
+      this.zonasBarrio = this.barrios.find(
+        b => b.id === this.nuevaJornada.barrioId
+      )?.zonas || [];
+
+      // Filtrar zonas seleccionadas que ya no estén disponibles
+      this.nuevaJornada.zonas = this.nuevaJornada.zonas.filter(
+        z => this.zonasBarrio.some(zb => zb.id === z.id)
+      );
+    } else {
+      // Si no hay campaña seleccionada, limpiar todo
+      this.nuevaJornada.barrioId = null;
+      this.zonasBarrio = [];
+      this.nuevaJornada.zonas = [];
+    }
+  }
+
+  onBarrioChange() {
+    if (this.nuevaJornada.barrioId) {
+      this.zonasBarrio = this.barrios.find(b => b.id === this.nuevaJornada.barrioId)?.zonas || [];
+
+      this.nuevaJornada.zonas = this.nuevaJornada.zonas.filter(z => this.zonasBarrio.some(zb => zb.id === z.id));
+    }
+    else {
+      this.zonasBarrio = [];
+      this.nuevaJornada.zonas = [];
+    }
+  }
+
+  getAvailableZonas() {
+    return this.zonasBarrio.filter(z =>
+      !this.nuevaJornada.zonas.some(sel => sel.id === z.id)
+    );
+  }
+
+  addZona() {
+    if (this.selectedZonaId) {
+      const zona = this.zonasBarrio.find(z => z.id === this.selectedZonaId);
+      if (zona && !this.nuevaJornada.zonas.some(z => z.id === zona.id)) {
+        this.nuevaJornada.zonas.push(zona);
+      }
+      this.selectedZonaId = null; // Resetear select
+    }
+  }
+  removeZona(zonaId: number) {
+    this.nuevaJornada.zonas = this.nuevaJornada.zonas.filter(z => z.id !== zonaId);
+  }
+
+  crearJornada() {
+    const body = {
+      fecha: this.nuevaJornada.fecha,
+      campaña: this.nuevaJornada.campania,
+      zonas: this.nuevaJornada.zonas,
+      encuestadores: this.nuevaJornada.encuestadores,
+    }
+    console.log('Cuerpo de la solicitud:', body);
+    this.http.post(`${environment.apiUrl}/jornadas/nuevaJornada`, body, { withCredentials: true }).subscribe({
+      next: (data) => {
+        alert('Jornada creada correctamente');
+        this.getJornadas();
+        this.reset();
+        const modalElement = document.getElementById('addJornadaModal');
+        if (modalElement) {
+          const modal = (window as any).bootstrap.Modal.getInstance(modalElement)
+            || new (window as any).bootstrap.Modal(modalElement);
+          modal.hide();
+        }
+      },
+      error: (error) => {
+        console.error('Error al crear la jornada:', error);
+        this.toastService.show("error", 'Error al crear la jornada, ' + error.error, 8000);
+      }
+    })
+  }
+
+  //se encarga de hacer una copia y abrir el modal
   editJornada(jornada: any) {
     this.jornadaEditada = {
       id: jornada.id,
       fecha: jornada.fecha,
       zonas: [...(jornada.zonas || [])],             // copia nueva del array
-      encuestadores: [...(jornada.encuestadores || [])], 
+      encuestadores: [...(jornada.encuestadores || [])],
     }
     console.log('Jornada original:', jornada);
     console.log('Jornada a editar:', this.jornadaEditada);
-    
+
     const modalElement = document.getElementById('editJornadaModal');
     if (modalElement) {
       const modal = new (window as any).bootstrap.Modal(modalElement);
@@ -267,8 +271,7 @@ export class Jornadas {
       zonas: this.jornadaEditada.zonas,
       encuestadores: this.jornadaEditada.encuestadores,
     }
-    const headers = this.auth.getHeaderHttp();
-    this.http.put(`${environment.apiUrl}/jornadas/editJornada/${this.jornadaEditada.id}`, body, { headers }).subscribe({
+    this.http.put(`${environment.apiUrl}/jornadas/editJornada/${this.jornadaEditada.id}`, body, { withCredentials: true }).subscribe({
       next: () => {
         alert('Jornada actualizada correctamente');
         this.getJornadas();
@@ -277,7 +280,7 @@ export class Jornadas {
       },
       error: (error) => {
         console.error('Error al actualizar la jornada:', error);
-        alert('Error al actualizar la jornada');
+        this.toastService.show("error", 'Error al actualizar la jornada, '+ error.error, 8000);
       }
     });
   }
@@ -289,14 +292,16 @@ export class Jornadas {
   }
 
   deleteJornada(jornadaId: number) {
-    const headers = this.auth.getHeaderHttp();
-    this.http.delete(`${environment.apiUrl}/jornadas/deleteJornada/${jornadaId}`, { headers }).subscribe({
+    this.http.delete(`${environment.apiUrl}/jornadas/deleteJornada/${jornadaId}`, { withCredentials: true }).subscribe({
       next: () => {
         alert('Jornada eliminada correctamente');
         this.getJornadas();
       },
       error: (error) => {
-        alert('Error al eliminar la jornada con ID: ' + jornadaId);
+        console.error(error);
+        
+        this.toastService.show("error", 'Error al eliminar la jornada, '+ error.error, 8000);
+        //alert('Error al eliminar la jornada con ID: ' + jornadaId);
       }
     })
   }
@@ -307,77 +312,77 @@ export class Jornadas {
       campania: null,
       zonas: [],
       encuestadores: [],
-      barrioId: null, 
+      barrioId: null,
     }
     this.selectedEncuestadorId = null;
     this.selectedZonaId = null;
   }
 
-getAvailableZonasEdit() {
-  const barrio = this.getBarrioDeZonasEdit();
-  if (!barrio) {
-    return [];
-  }
-  return barrio.zonas.filter((z: Zona) =>
-    !this.jornadaEditada.zonas.some(sel => sel.id === z.id)
-  );
-}
-
-addZonaEdit(zonaId: number | null) {
-  if (zonaId) {
+  getAvailableZonasEdit() {
     const barrio = this.getBarrioDeZonasEdit();
     if (!barrio) {
-      console.error('No se encontró barrio para la jornadaEditada');
-      return;
+      return [];
     }
-    const zona = barrio.zonas.find((z: Zona) => z.id === zonaId);
-    if (zona && !this.jornadaEditada.zonas.some(z => z.id === zona.id)) {
-      this.jornadaEditada.zonas.push(zona);
-      console.log('Zona agregada:', zona);
-    }
-    this.selectedZonaIdEdit = null;
-  }
-}
-
-removeZonaEdit(zonaId: number) {
-  this.jornadaEditada.zonas = this.jornadaEditada.zonas.filter(z => z.id !== zonaId);
-}
-
-getAvailableEncuestadoresEdit() {
-  return this.encuestadores.filter(e => !this.jornadaEditada.encuestadores.some(sel => sel.id === e.id));
-}
-
-addEncuestadorEdit() {
-  if (this.selectedEncuestadorId) {
-    const enc = this.encuestadores.find(e => e.id === this.selectedEncuestadorId);
-    if (enc && !this.jornadaEditada.encuestadores.some(e => e.id === enc.id)) {
-      this.jornadaEditada.encuestadores.push(enc);
-    }
-    this.selectedEncuestadorId = null;
-  }
-}
-
-removeEncuestadorEdit(encuestadorId: number) {
-  this.jornadaEditada.encuestadores = this.jornadaEditada.encuestadores.filter(e => e.id !== encuestadorId);
-}
-
-getBarrioDeZonasEdit(): any | null {
-  if (!this.jornadaEditada.zonas || this.jornadaEditada.zonas.length === 0) {
-    return null; // No hay zonas, no hay barrio asociado
+    return barrio.zonas.filter((z: Zona) =>
+      !this.jornadaEditada.zonas.some(sel => sel.id === z.id)
+    );
   }
 
-  // Ids de las zonas que tiene la jornada editada
-  const zonaIds = this.jornadaEditada.zonas.map(z => z.id);
-
-  // Buscar barrio que tenga alguna zona cuyo id esté en zonaIds
-  for (const barrio of this.barrios) {
-    if (barrio.zonas && barrio.zonas.some((z: any) => zonaIds.includes(z.id))) {
-      return barrio;
+  addZonaEdit(zonaId: number | null) {
+    if (zonaId) {
+      const barrio = this.getBarrioDeZonasEdit();
+      if (!barrio) {
+        console.error('No se encontró barrio para la jornadaEditada');
+        return;
+      }
+      const zona = barrio.zonas.find((z: Zona) => z.id === zonaId);
+      if (zona && !this.jornadaEditada.zonas.some(z => z.id === zona.id)) {
+        this.jornadaEditada.zonas.push(zona);
+        console.log('Zona agregada:', zona);
+      }
+      this.selectedZonaIdEdit = null;
     }
   }
 
-  return null; // Si no encuentra ningún barrio con esas zonas
-}
+  removeZonaEdit(zonaId: number) {
+    this.jornadaEditada.zonas = this.jornadaEditada.zonas.filter(z => z.id !== zonaId);
+  }
+
+  getAvailableEncuestadoresEdit() {
+    return this.encuestadores.filter(e => !this.jornadaEditada.encuestadores.some(sel => sel.id === e.id));
+  }
+
+  addEncuestadorEdit() {
+    if (this.selectedEncuestadorId) {
+      const enc = this.encuestadores.find(e => e.id === this.selectedEncuestadorId);
+      if (enc && !this.jornadaEditada.encuestadores.some(e => e.id === enc.id)) {
+        this.jornadaEditada.encuestadores.push(enc);
+      }
+      this.selectedEncuestadorId = null;
+    }
+  }
+
+  removeEncuestadorEdit(encuestadorId: number) {
+    this.jornadaEditada.encuestadores = this.jornadaEditada.encuestadores.filter(e => e.id !== encuestadorId);
+  }
+
+  getBarrioDeZonasEdit(): any | null {
+    if (!this.jornadaEditada.zonas || this.jornadaEditada.zonas.length === 0) {
+      return null; // No hay zonas, no hay barrio asociado
+    }
+
+    // Ids de las zonas que tiene la jornada editada
+    const zonaIds = this.jornadaEditada.zonas.map(z => z.id);
+
+    // Buscar barrio que tenga alguna zona cuyo id esté en zonaIds
+    for (const barrio of this.barrios) {
+      if (barrio.zonas && barrio.zonas.some((z: any) => zonaIds.includes(z.id))) {
+        return barrio;
+      }
+    }
+
+    return null; // Si no encuentra ningún barrio con esas zonas
+  }
 
   updatePaginatedJornadas() {
     this.filtered = this.getFilteredJornadas();
@@ -387,18 +392,18 @@ getBarrioDeZonasEdit(): any | null {
   }
 
   getFilteredJornadas() {
-    return this.jornadas.filter(jornada =>{
+    return this.jornadas.filter(jornada => {
       const fecha = new Date(jornada.fecha);
 
-      if (!this.fechaDesdeFilter && !this.fechaHastaFilter){
+      if (!this.fechaDesdeFilter && !this.fechaHastaFilter) {
         return true;
       }
 
-      if (this.fechaDesdeFilter && !this.fechaHastaFilter){
+      if (this.fechaDesdeFilter && !this.fechaHastaFilter) {
         return fecha >= new Date(this.fechaDesdeFilter);
       }
 
-      if (!this.fechaDesdeFilter && this.fechaHastaFilter){
+      if (!this.fechaDesdeFilter && this.fechaHastaFilter) {
         return fecha <= new Date(this.fechaHastaFilter);
       }
 
@@ -430,7 +435,7 @@ getBarrioDeZonasEdit(): any | null {
   }
 
   nextPage() {
-    if ((this.currentPage * this.selectedPageSize) < this.filtered.length){
+    if ((this.currentPage * this.selectedPageSize) < this.filtered.length) {
       this.currentPage++;
       this.updatePaginatedJornadas();
     }
@@ -452,11 +457,11 @@ getBarrioDeZonasEdit(): any | null {
 
   getTotalPages(): number {
     return Math.ceil(this.filtered.length / this.selectedPageSize);
-  }  
+  }
 
   goToPage(page: number): void {
     this.currentPage = page;
     this.updatePaginatedJornadas();
   }
-  
+
 }

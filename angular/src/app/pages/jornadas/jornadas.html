@@ -4,7 +4,7 @@
   <div class="row gy-3">
     <span class="d-flex justify-content-between align-items-center">
       <h5 class="fw-bold text-primary ">Jornadas</h5>
-      <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addJornadaModal"><i
+      <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addJornadaModal" *ngIf="auth.checkPermiso('CREATE_JORNADA')"><i
           class="bi bi-plus"></i>Añadir jornada</button>
     </span>
     <span class="d-flex justify-content-between align-items-center">
@@ -29,7 +29,7 @@
     </span>
 
     <div class="table-responsive" *ngIf="jornadas.length === 0">
-      <table class="table table-hover nomidborder-table border-top-1">
+      <table class="table table-hover nomidborder-table border-top-1" *ngIf="auth.checkPermiso('GET_JORNADA')">
         <tbody>
           <tr  *ngFor="let num of [].constructor(selectedPageSize); let i = index">
             <td>
@@ -68,7 +68,7 @@
                             <th class="text-center">Fecha</th>
                             <th class="text-center">Zonas</th>
                             <th class="text-center">Encuestadores</th>
-                            <th *ngIf="rolUser === 'Admin'" class="text-center">Acciones</th> <!-- CAMBIAR POR EL SERVICE -->
+                            <th  class="text-center">Acciones</th> <!-- CAMBIAR POR EL SERVICE -->
                         </tr>
                     </thead>
         <tbody>
@@ -82,7 +82,7 @@
                                     <span class="text-muted">No hay zonas registradas</span>
                                 </div>
                                 <div *ngFor="let zona of jornada.zonas">
-                                    <a [routerLink]="['/zonas/', zona.id]">
+                                    <a routerLink="/barrios">
                                         {{ zona.nombre }}
                                     </a>
                                 </div>
@@ -99,20 +99,23 @@
                                 </div>
                             </td>
 
-                            <td class="align-middle text-center" *ngIf="rolUser === 'Admin'"> <!-- CAMBIAR POR EL SERVICE-->
+                            <td class="align-middle text-center"  > <!-- CAMBIAR POR EL SERVICE -->
                                 <div class="d-flex justify-content-center gap-2">
                                     <button class="btn btn-outline-primary" title="Editar"
-                                        (click)="editJornada(jornada)">
+                                        (click)="editJornada(jornada)"
+                                        *ngIf="auth.checkPermiso('UPDATE_JORNADA')">
                                         <i class="bi bi-pencil"></i>
                                     </button>
 
                                     <button class="btn btn-outline-secondary" title="Ver"
-                                        [routerLink]="['/jornada', jornada.id]">
+                                        [routerLink]="['/jornada', jornada.id]"
+                                        *ngIf="auth.checkPermiso('GET_JORNADA')">
                                         <i class="bi bi-eye"></i>
                                     </button>
 
                                     <button class="btn btn-outline-danger" title="Eliminar"
-                                        (click)="confirmDelete(jornada.id)">
+                                        (click)="confirmDelete(jornada.id)"
+                                        *ngIf="auth.checkPermiso('DELETE_JORNADA')">
                                         <i class="bi bi-trash"></i>
                                     </button>
                                 </div>
@@ -258,7 +261,7 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-success" [disabled]="jornadaForm.invalid">
+                    <button type="submit" class="btn btn-success" [disabled]="jornadaForm.invalid" *ngIf="auth.checkPermiso('CREATE_JORNADA')">
                         Guardar
                     </button>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="reset()">
@@ -353,7 +356,7 @@
             <!-- Footer -->
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary" (click)="actualizarJornada()">Actualizar</button>
+                <button type="button" class="btn btn-primary" (click)="actualizarJornada()" *ngIf="auth.checkPermiso('UPDATE_JORNADA')">Actualizar</button>
             </div>
 
         </div>

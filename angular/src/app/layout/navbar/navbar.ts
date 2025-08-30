@@ -6,25 +6,22 @@ import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-navbar',
-  standalone: true, 
+  standalone: true,
   imports: [RouterModule, CommonModule],
   templateUrl: './navbar.html',
   styleUrl: './navbar.css'
 })
 export class Navbar {
-  constructor(public auth: AuthService,
-              private router: Router
-  ){} //permite que el html use auth para verificar el estado de autenticación
+  constructor (
+    public auth: AuthService,
+    private router: Router
+  ) { } //permite que el html use auth para verificar el estado de autenticación
 
   logout() {
     this.auth.logout();
-    this.router.navigate(['/login']); 
   }
 
-  showLoginButton(): boolean {
-    return (
-      !this.auth.isLoggedIn() &&
-      this.router.url !== '/login'
-    );
+  checkUrl(): boolean {
+    return this.router.url !== '/login'
   }
 }

@@ -1,11 +1,12 @@
 import { Component } from '@angular/core';
 import { Navbar } from "../../layout/navbar/navbar";
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment.development';
 import { AuthService } from '../../auth/auth-service/auth-service';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { ToastService } from '../../layout/notificaciones/toast.service';
 
 @Component({
   selector: 'app-campanias',
@@ -18,7 +19,7 @@ export class Campanias {
   campanias: any[] = [];
   barrios: any[] = [];
 
-  rolUser: string | null = null;
+  rolUser: string[] = [];
 
   nuevaCampania = {
     nombre: '',
@@ -35,31 +36,34 @@ export class Campanias {
     barrioId: null
   }
 
-   // Filtros
+  // Filtros
   nombreFilter: string = '';
   barrioFilter: number | null = null;
   fechaDesdeFilter: string = '';
   fechaHastaFilter: string = '';
 
-   // Paginación
+  // Paginación
   currentPage: number = 1;
   selectedPageSize: number = 5;
   filtered: any[] = [];
   paginatedCampanias: any[] = [];
 
   constructor(
+    private toastService: ToastService, //Notificaciones
     private http: HttpClient,
-    private auth: AuthService,
-  ){}
+    public auth: AuthService,
+  ) { }
 
 
-  ngOnInit(){
+  ngOnInit() {
     this.getCampanias();
-    this.rolUser = this.auth.getUserRole();
+    this.auth.getUserRole().subscribe(roles => {
+      this.rolUser = roles;
+    });
   }
 
 
-  getCampanias(){
+  getCampanias() {
     this.http.get<any>(`${environment.apiUrl}/campanias`).subscribe({
       next: (data) => {
         //console.log('Campañas recibidas:', data);
@@ -68,6 +72,7 @@ export class Campanias {
       },
       error: (error) => {
         alert(`Error al obtener las campañas: ${error}`);
+        this.toastService.show("error", 'Error al obtener las campañas, '+ error.error, 8000);
       }
     })
     this.getBarrios();
@@ -79,8 +84,9 @@ export class Campanias {
         //console.log('Barrios recibidos:', data);
         this.barrios = data;
       },
-    error: (error) => {
+      error: (error) => {
         console.error('Error al obtener los barrios:', error);
+        this.toastService.show("error", 'Error al obtener los barrios, '+ error.error, 8000);
       }
     })
   }
@@ -97,23 +103,22 @@ export class Campanias {
       }
     };
 
-    const headers = this.auth.getHeaderHttp();
-
-      this.http.post<any>(`${environment.apiUrl}/campanias/nuevaCampania`, body, { headers }).subscribe({
-        next: (data) => {
-          //console.log('Campaña creada:', body);
-          alert('Campaña creada correctamente');
-          this.getCampanias();
-          this.resetFormulario();
-          this.cerrarModal('addCampaniaModal');
-        },
-        error: (error) => {
-          console.error('Error al crear la campaña:', error);
-          alert('Error al crear la campaña');
-        }
-      })
+    this.http.post<any>(`${environment.apiUrl}/campanias/nuevaCampania`, body, { withCredentials: true }).subscribe({
+      next: (data) => {
+        //console.log('Campaña creada:', body);
+        alert('Campaña creada correctamente');
+        this.getCampanias();
+        this.resetFormulario();
+        this.cerrarModal('addCampaniaModal');
+      },
+      error: (error) => {
+        console.error('Error al crear la campaña:', error);
+        //alert('Error al crear la campaña');
+        this.toastService.show("error", 'Error al crear la campaña, ' + error.error, 8000);
+      }
+    })
   }
-  
+
   resetFormulario() {
     this.nuevaCampania = {
       nombre: '',
@@ -124,20 +129,20 @@ export class Campanias {
   }
 
   cerrarModal(modalId: string) {
-  const modalElement = document.getElementById(modalId);
-  if (modalElement) {
-    const modal = (window as any).bootstrap.Modal.getInstance(modalElement);
-    if (modal) {
-      modal.hide();
+    const modalElement = document.getElementById(modalId);
+    if (modalElement) {
+      const modal = (window as any).bootstrap.Modal.getInstance(modalElement);
+      if (modal) {
+        modal.hide();
+      }
     }
   }
-}
   editCampania(campania: any) {
-    this.campaniaEditada = { 
+    this.campaniaEditada = {
       id: campania.id,
       nombre: campania.nombre,
       inicio: campania.inicio,
-      fin: campania.fin? campania.fin : '',
+      fin: campania.fin ? campania.fin : '',
       barrioId: campania.barrio ? campania.barrio.id : null
     }
 
@@ -150,17 +155,15 @@ export class Campanias {
 
   actualizarCampania() {
     const body = {
-    nombre: this.campaniaEditada.nombre,
-    inicio: this.campaniaEditada.inicio,
-    fin: this.campaniaEditada.fin,
-    barrio: {
-      id: this.campaniaEditada.barrioId
+      nombre: this.campaniaEditada.nombre,
+      inicio: this.campaniaEditada.inicio,
+      fin: this.campaniaEditada.fin,
+      barrio: {
+        id: this.campaniaEditada.barrioId
       }
     };
 
-    const headers = this.auth.getHeaderHttp();
-
-    this.http.put<any>(`${environment.apiUrl}/campanias/editCampania/${this.campaniaEditada.id}`, body, { headers }).subscribe({
+    this.http.put<any>(`${environment.apiUrl}/campanias/editCampania/${this.campaniaEditada.id}`, body, { withCredentials: true }).subscribe({
       next: (data) => {
         //console.log('Campaña actualizada:', body);
         alert('Campaña actualizada correctamente');
@@ -171,7 +174,7 @@ export class Campanias {
       },
       error: (error) => {
         console.error('Error al actualizar la campaña:', error);
-        alert('Error al actualizar la campaña');
+        this.toastService.show("error", 'Error al actualizar la campaña, ' + error.error, 8000);
       }
     });
   }
@@ -184,9 +187,9 @@ export class Campanias {
   }
 
   deleteCampania(campaniaId: number) {
-    //console.log('Eliminando campaña con ID:', campaniaId);
-    const headers = this.auth.getHeaderHttp();
-    this.http.delete(`${environment.apiUrl}/campanias/deleteCampania/${campaniaId}`, { headers }).subscribe({
+    console.log('Eliminando campaña con ID:', campaniaId);
+
+    this.http.delete(`${environment.apiUrl}/campanias/deleteCampania/${campaniaId}`, { withCredentials: true }).subscribe({
       next: () => {
         alert('Campaña eliminada correctamente');
         this.getCampanias();
@@ -285,5 +288,5 @@ export class Campanias {
     this.currentPage = page;
     this.updatePaginatedCampanias();
   }
-  
+
 }

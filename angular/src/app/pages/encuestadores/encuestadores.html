@@ -5,7 +5,8 @@
   <div class="row gy-3">
     <span class="d-flex justify-content-between align-items-center">
       <h5 class="fw-bold text-primary ">Encuestadores</h5>
-      <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addEncuestadorModal"><i
+      <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addEncuestadorModal"
+      *ngIf="auth.checkPermiso('CREATE_ENCUESTADOR')"><i
           class="bi bi-plus"></i>Añadir encuestador</button>
     </span>
     <span class="d-flex justify-content-between align-items-center">
@@ -57,7 +58,7 @@
     </div>
 
     <div class="table-responsive" *ngIf="paginatedEncuestadores && paginatedEncuestadores.length > 0">
-      <table class="table table-hover nomidborder-table border-top" >
+      <table class="table table-hover nomidborder-table border-top" *ngIf="auth.checkPermiso('GET_ENCUESTADOR')">
         <tbody>
           <tr *ngFor="let encuestador of paginatedEncuestadores">
             <td [routerLink]="['/encuestadores', encuestador.id]" [ngStyle]="{ cursor: 'pointer' }">{{ encuestador.nombre }}</td>
@@ -68,7 +69,7 @@
             <td class="p-0" style="min-width:40; width:40px;">
               <button
                 class="w-100 p-2 border-0 rounded-0 h-100 btn btn-outline-danger d-flex justify-content-center align-items-center fw-bold"
-                (click)="confirmDelete(encuestador.id)">
+                (click)="confirmDelete(encuestador.id)" *ngIf="auth.checkPermiso('DELETE_ENCUESTADOR')">
                 <i class="bi bi-trash"></i>
               </button>
             </td>
@@ -180,7 +181,7 @@
 
 
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-success" [disabled]="encuestadorForm.invalid">
+                    <button type="submit" class="btn btn-success" [disabled]="encuestadorForm.invalid" *ngIf="auth.checkPermiso('CREATE_ENCUESTADOR')">
                         Guardar
                     </button>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">

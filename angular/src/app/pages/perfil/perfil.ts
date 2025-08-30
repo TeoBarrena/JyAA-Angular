@@ -40,7 +40,7 @@ export class Perfil {
     constructor(
         private toastService: ToastService,
         private http: HttpClient,
-        private authService: AuthService,
+        public authService: AuthService,
         private route: ActivatedRoute,
         private router: Router
     ) { }
@@ -52,7 +52,7 @@ export class Perfil {
     }
 
     getUsuario() {
-        this.http.get<Usuario>(`${environment.apiUrl}/usuarios/${localStorage.getItem('userId')}`).subscribe({
+        this.http.get<Usuario>(`${environment.apiUrl}/usuarios/${this.authService.getUserId()}`).subscribe({
             next: data => {
                 this.usuario = data;
             },

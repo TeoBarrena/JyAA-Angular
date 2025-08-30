@@ -4,8 +4,8 @@
   <div class="row gy-3">
     <span class="d-flex justify-content-between align-items-center">
       <h5 class="fw-bold text-primary">Campañas</h5>
-      <button class="btn btn-primary" *ngIf="rolUser === 'Admin'"
-              data-bs-toggle="modal" data-bs-target="#addCampaniaModal"> <!-- CAMBIAR POR EL SERVICE -->
+      <button class="btn btn-primary" *ngIf="auth.checkPermiso('CREATE_CAMPAÑA')"
+              data-bs-toggle="modal" data-bs-target="#addCampaniaModal"><!-- rolUser?.includes('Admin') CAMBIAR POR EL SERVICE -->
         <i class="bi bi-plus"></i> Añadir campaña
       </button>
     </span>
@@ -58,7 +58,7 @@
       </div>
     </span>
 
-    <div class="table-responsive" *ngIf="campanias.length === 0">
+    <div class="table-responsive" *ngIf="campanias.length === 0" >
       <table class="table table-hover nomidborder-table border-top-1">
         <tbody>
           <tr  *ngFor="let num of [].constructor(selectedPageSize); let i = index">
@@ -93,14 +93,14 @@
 
     <!-- Tabla -->
     <div class="table-responsive" *ngIf="paginatedCampanias && paginatedCampanias.length > 0">
-      <table class="table table-hover border-top">
+      <table class="table table-hover border-top" *ngIf="auth.checkPermiso('GET_CAMPAÑA')">
         <thead class="table-dark">
           <tr>
             <th class="text-center">Campaña</th>
             <th class="text-center">Fecha Inicio / Fin</th>
             <th class="text-center">Barrio</th>
             <th class="text-center">Jornadas</th>
-            <th *ngIf="rolUser === 'Admin'" class="text-center">Acciones</th>  <!-- CAMBIAR POR EL SERVICE -->
+            <th class="text-center">Acciones</th><!-- CAMBIAR POR EL SERVICE -->
           </tr>
         </thead>
         <tbody>
@@ -108,7 +108,7 @@
             <td class="align-middle text-center fw-semibold">{{ campania.nombre }}</td>
             <td class="align-middle text-center fw-semibold">{{ campania.inicio }} / {{ campania.fin }}</td>
             <td class="align-middle text-center">
-              <a [routerLink]="['/barrios', campania.barrio.id]">{{ campania.barrio.nombre }}</a>
+              <a routerLink="/barrios">{{ campania.barrio.nombre }}</a>
             </td>
             <td class="align-middle text-center fw-semibold">
               <div *ngIf="campania.jornadas.length === 0">
@@ -118,12 +118,12 @@
                 <a [routerLink]="['/jornada', jornada.id]">{{ jornada.fecha }}</a>
               </div>
             </td>
-            <td class="align-middle text-center" *ngIf="rolUser === 'Admin'">  <!-- CAMBIAR POR EL SERVICE -->
+            <td class="align-middle text-center"><!-- CAMBIAR POR EL SERVICE -->
               <div class="d-flex justify-content-center gap-2">
-                <button class="btn btn-outline-primary" (click)="editCampania(campania)">
+                <button class="btn btn-outline-primary" (click)="editCampania(campania)" *ngIf="auth.checkPermiso('UPDATE_CAMPAÑA')">
                   <i class="bi bi-pencil"></i>
                 </button>
-                <button class="btn btn-outline-danger" (click)="confirmDelete(campania.id)">
+                <button class="btn btn-outline-danger" (click)="confirmDelete(campania.id)" *ngIf="auth.checkPermiso('DELETE_CAMPAÑA')">
                   <i class="bi bi-trash"></i>
                 </button>
               </div>
@@ -241,7 +241,7 @@
         </div>
 
         <div class="modal-footer">
-          <button type="submit" class="btn btn-success" [disabled]="campaniaForm.invalid">
+          <button type="submit" class="btn btn-success" *ngIf="auth.checkPermiso('CREATE_CAMPAÑA')" [disabled]="campaniaForm.invalid">
             Guardar
           </button>
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
@@ -325,7 +325,7 @@
         </div>
 
         <div class="modal-footer">
-          <button type="submit" class="btn btn-primary" [disabled]="editCampaniaForm.invalid">Actualizar</button>
+          <button type="submit" class="btn btn-primary" *ngIf="auth.checkPermiso('UPDATE_CAMPAÑA')" [disabled]="editCampaniaForm.invalid">Actualizar</button>
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
         </div>
       </form>

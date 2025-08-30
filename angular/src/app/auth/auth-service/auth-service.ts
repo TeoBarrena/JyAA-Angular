@@ -1,61 +1,132 @@
-import { HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable, of } from 'rxjs';
+import { environment } from '../../../environments/environment.development';
+import { Router } from '@angular/router';
+import { ToastService } from '../../layout/notificaciones/toast.service';
+import { map, catchError, tap } from 'rxjs/operators';
+import { combineLatest } from 'rxjs';
 
 //Funciona como un servicio no como componente
-@Injectable({providedIn: 'root'}) //permite inyeccion global del servicio
+@Injectable({ providedIn: 'root' }) //permite inyeccion global del servicio
 export class AuthService {
-  private loggedIn = new BehaviorSubject<boolean>(this.hasSession()); //observable para el estado de autenticación
-  isLoggedIn$ = this.loggedIn.asObservable(); //observable para que otros componentes puedan suscribirse
 
-  private hasSession(): boolean {
-    return localStorage.getItem('isLoggedIn') === 'true'; //verifica si hay una sesión activa
-  }
+  constructor(
+    private http: HttpClient,
+    private router: Router,
+    private toastService: ToastService
+  ) { }
 
-  login(){
-    localStorage.setItem('isLoggedIn', 'true'); //guarda el estado de inicio de sesión en localStorage
+  private loggedIn$ = new BehaviorSubject<boolean>(false);
+  private userRole$ = new BehaviorSubject<string[]>([]);
+  private userPermiso$ = new BehaviorSubject<string[]>([]);
+  private userId$ = new BehaviorSubject<number | null>(null);
+
+  public isLoggedIn: Observable<boolean> = this.loggedIn$.asObservable();
+  public userRoles: Observable<string[]> = this.userRole$.asObservable();
+  public userPermisos: Observable<string[]> = this.userPermiso$.asObservable();
+  public userId: Observable<number | null> = this.userId$.asObservable();
+
+  login(roles: string[], userId: number, permisos: string[]) {
     localStorage.setItem('pageSize', '5'); //guarda el default de cantidad de elementos por pagina
-    this.loggedIn.next(true); //cambia el estado a inicio sesión
-  }
+    this.loggedIn$.next(true);
+    this.setUserRole(roles);
+    this.setUserPermisos(permisos);
+    this.setUserId(userId);
 
-  logout(){
-    localStorage.removeItem('isLoggedIn'); 
-    localStorage.removeItem('userRole'); 
-    localStorage.removeItem('userId');
-    localStorage.removeItem('pageSize');
-    this.clearToken();
-    this.loggedIn.next(false); 
-  }
 
-  isLoggedIn(): boolean {
-    return this.loggedIn.value; //devuelve el estado actual de autenticación
-  }
+    // imprimir todos los roles
+    console.log('Roles:');
+    roles.forEach((rol) => console.log(rol));
 
-  //Manejo de token para JWT
-  setToken(token:string): void {
-    localStorage.setItem('token', token);
-  }
-
-  getToken(): string | null {
-    return localStorage.getItem('token');
-  }
-
-  clearToken(): void {
-    return localStorage.removeItem('token');
+    // imprimir todos los permisos
+    console.log('Permisos:');
+    permisos.forEach((permiso) => console.log(permiso));
+    //this.permisosService.set(roles, permisos);
   }
 
   //Manejo de roles 
-  setUserRole(role: string) {
-    localStorage.setItem('userRole', role);
+  setUserRole(roles: string[]) {
+    this.userRole$.next(roles);
   }
 
-  getUserRole(): string | null {
-    return localStorage.getItem('userRole'); //devuelve el rol del usuario almacenado en localStorage
+  getUserRole() {
+    return this.userRole$.asObservable();
   }
 
-  getHeaderHttp(): HttpHeaders {
-    const token = this.getToken();
-    return new HttpHeaders().set('Authorization', `Bearer ${token}`); //configura el header HTTP con el token JWT
+  //manejo de permisos
+  setUserPermisos(permisos: string[]) {
+    this.userPermiso$.next(permisos);
   }
+
+  getPermisos() {
+    return this.userPermiso$.asObservable();
+  }
+
+  setUserId(id: number | null) {
+    this.userId$.next(id);
+  }
+
+  getUserId(): number | null {
+    return this.userId$.value;
+  }
+
+  checkSession(): Observable<boolean> {
+    return this.http.get<any>(`${environment.apiUrl}/auth/check-session`, { withCredentials: true }).pipe(
+
+      tap(response => {
+        this.login(response.roles, response.id, response.permisos);
+      }),
+
+      map(() => true),
+
+      catchError(() => {
+        console.log('No active session found');
+        this.loggedIn$.next(false);
+        this.userRole$.next([]);
+        this.userPermiso$.next([]);
+        this.userId$.next(null);
+        return of(false);
+      })
+    );
+  }
+
+  checkPermiso(permiso: string): boolean {
+    const permisos = this.userPermiso$.value;
+    const roles = this.userRole$.value;
+
+    if (!permisos.length && !roles.length) return false;
+
+    if (permisos.includes('ADMIN') || roles.includes('Admin')) {
+      return true;
+    }
+
+    return permisos.includes(permiso);
+  }
+
+  checkRol(rol: string): boolean {
+    const roles = this.userRole$.value;
+    return roles.includes(rol) || roles.includes('Admin');
+  }
+
+  logout() {
+    this.loggedIn$.next(false);
+    this.setUserRole([]);
+    this.setUserPermisos([]);
+    this.setUserId(null);
+
+    //this.permisosService.clean();
+    this.router.navigate(['/login']);
+
+    this.http.post<any>(`${environment.apiUrl}/auth/logout`, {}, { withCredentials: true }).subscribe({
+      next: () => {
+        this.toastService.show('info-outline', 'Sesión cerrada con éxito');
+      },
+      error: () => {
+        this.toastService.show('error-outline', 'Error al cerrar sesión');
+      }
+    });
+  }
+
 
 }

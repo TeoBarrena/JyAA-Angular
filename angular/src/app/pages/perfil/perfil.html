@@ -45,7 +45,7 @@
                 </div>
                 <div class="col-12 d-flex justify-content-end align-items-center mt-3">
                     <button class="btn btn-outline-primary me-3" data-bs-toggle="modal"
-                        data-bs-target="#modalCambiarContraseña">
+                        data-bs-target="#modalCambiarContraseña" *ngIf="authService.checkPermiso('UPDATESELF_USUARIO')">
                         <i class="bi bi-key fw-bold me-2 my-0 py-0"></i>
                         Cambiar contraseña
                     </button>

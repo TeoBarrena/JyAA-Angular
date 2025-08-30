@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Navbar } from "../../layout/navbar/navbar";
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../auth/auth-service/auth-service';
 import { FormsModule } from '@angular/forms';
@@ -25,7 +25,7 @@ export class Usuarios {
   organizaciones: any[] = [];
 
   //Para almacenar el rol del usuario autenticado
-  userRole: string | null = null;
+  userRole: string[] = [];
 
   //Paginación
   //pageSizeOptions: number[] = [2, 5, 10];
@@ -37,7 +37,7 @@ export class Usuarios {
   tipoFilter: string = '';
   organizacionFilter: string = '';
   filtered: any[] = [];
-  currentUserId: number = 0;
+  currentUserId: number | null = null;
   currentUserRole: string | null = null;
 
   newUser: any = {
@@ -55,16 +55,17 @@ export class Usuarios {
   constructor(
     private toastService: ToastService, //Notificaciones
     private http: HttpClient, //Inyeccion de HttpClient
-    private auth: AuthService,
+    public auth: AuthService,
     private router: Router
   ) { }
 
   ngOnInit() {
     this.getOrganizaciones();
     this.getUsers();
-    this.userRole = this.auth.getUserRole();
-    this.currentUserId = Number(localStorage.getItem('userId'));
-    this.currentUserRole = localStorage.getItem('userRole');
+    this.currentUserId = this.auth.getUserId();
+    this.auth.getUserRole().subscribe(roles => {
+      this.userRole = roles;
+    })
   }
 
   getUsers() {
@@ -86,9 +87,10 @@ export class Usuarios {
         
         this.updatePaginatedUsers();
       },
-      error: () => {
+      error: (error) => {
         //alert('Error al obtener los usuarios');
-        this.toastService.show('error', 'Error al obtener los usuarios');
+        console.error(error);
+        this.toastService.show('error', 'Error al obtener los usuarios, '+ error.error, 8000);
       }
     })
   }
@@ -98,8 +100,9 @@ export class Usuarios {
       next: data => {
         this.organizaciones = data;
       },
-      error: () => {
-        this.toastService.show('error', 'Error al obtener las organizaciones');
+      error: (error) => {
+        console.error(error);
+        this.toastService.show('error', 'Error al obtener las organizaciones, '+ error.error, 8000);
       }
     });
   }
@@ -183,10 +186,8 @@ export class Usuarios {
       }
     }
 
-    const token = localStorage.getItem('token');
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
 
-    this.http.post(`${environment.apiUrl}/usuarios/nuevoUser`, body, { headers }).subscribe({
+    this.http.post(`${environment.apiUrl}/usuarios/nuevoUser`, body, { withCredentials: true }).subscribe({
       next: () => {
         this.toastService.show('success', 'Usuario registrado exitosamente');
         this.getUsers();
@@ -255,10 +256,8 @@ export class Usuarios {
   }
 
   public deleteUser(userId: number): void {
-    const token = localStorage.getItem('token'); //se necesita el token para en el back verificar que el usuario es admin 
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`); //setea el header de autorización con el token
 
-    this.http.delete(`${environment.apiUrl}/usuarios/deleteUser/${userId}`, { headers }).subscribe({
+    this.http.delete(`${environment.apiUrl}/usuarios/deleteUser/${userId}`, { withCredentials: true }).subscribe({
       next: () => {
         this.getUsers();
         (document.getElementById('closeModalBtn') as HTMLElement)?.click();
@@ -293,10 +292,8 @@ export class Usuarios {
 
 
   public cambiarEstado(userId: number, estado: string): void {
-    const token = localStorage.getItem('token'); //se necesita el token para en el back verificar que el usuario es admin 
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`); //setea el header de autorización con el token
 
-    this.http.patch(`${environment.apiUrl}/usuarios/${userId}/${estado}`, null, { headers }).subscribe({
+    this.http.patch(`${environment.apiUrl}/usuarios/${userId}/${estado}`, null, { withCredentials: true }).subscribe({
       next: () => {
         this.toastService.show('success-outline', 'Estado del usuario modificado', 2000);
         this.getUsers();
@@ -351,9 +348,9 @@ export class Usuarios {
         usuarioActualizar.organizacion = { id: this.newUser.organizacion.id };
       }
     }
-    const token = localStorage.getItem('token');
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-    this.http.put<any>(`${environment.apiUrl}/usuarios/${usuarioActualizar.id}`, usuarioActualizar, { headers }).subscribe({
+    //const token = localStorage.getItem('token');
+    //const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    this.http.put<any>(`${environment.apiUrl}/usuarios/updateUsuario/${usuarioActualizar.id}`, usuarioActualizar, { withCredentials: true }).subscribe({
       next: () => {
         this.getUsers();
         (document.getElementById('closeModalBtn') as HTMLElement)?.click();
